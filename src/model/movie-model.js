@@ -3,9 +3,9 @@ import { generateComment } from '../mock/comment.js';
 import {getRandomInteger} from '../utils.js';
 
 export default class MovieModel {
-  comments = Array.from({length: 20}, generateComment);
+  #comments = Array.from({length: 20}, generateComment);
   commentsId = Array.from(this.comments, (commentId) => commentId.id);
-  movies = Array.from({length: 5}, (index) => {
+  #movies = Array.from({length: 5}, (index) => {
     // eslint-disable-next-line prefer-const
     let commentsList = [];
 
@@ -26,8 +26,13 @@ export default class MovieModel {
 
   });
 
-  getMovies = () => this.movies;
-  getComments = () => this.comments;
+  get movies () {
+    return this.#movies;
+  }
+
+  get comments() {
+    return this.#comments;
+  }
 
   calculateValues = (param) => {
     let count = 0;

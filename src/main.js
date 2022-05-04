@@ -10,12 +10,12 @@ const siteMainPart = document.querySelector('.main');
 const siteFooterPart = document.querySelector('.footer');
 
 const movieModel = new MovieModel();
-const contentPresenter = new ContentPresenter();
+const contentPresenter = new ContentPresenter(siteHeaderPart, siteMainPart, movieModel, siteFooterPart);
 
 render(new UserRank(), siteHeaderPart);
 render(new Sort(), siteMainPart);
 render(new FooterInfo, siteFooterPart);
 
-contentPresenter.init(siteHeaderPart, siteMainPart, movieModel, siteFooterPart);
+contentPresenter.init();
 
 
