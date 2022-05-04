@@ -5,9 +5,8 @@ import {getRandomInteger} from '../utils.js';
 export default class MovieModel {
   #comments = Array.from({length: 20}, generateComment);
   commentsId = Array.from(this.comments, (commentId) => commentId.id);
-  #movies = Array.from({length: 5}, (index) => {
-    // eslint-disable-next-line prefer-const
-    let commentsList = [];
+  #movies = Array.from({length: 12}, (index) => {
+    const commentsList = [];
 
     for(let i = 0; i < this.commentsId.length; i++) {
       if(this.commentsId[i] !== -1) {
