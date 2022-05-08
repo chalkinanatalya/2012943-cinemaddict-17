@@ -4,7 +4,11 @@ import {getRandomInteger} from '../utils.js';
 
 export default class MovieModel {
   #comments = Array.from({length: 20}, generateComment);
-  commentsId = Array.from(this.comments, (commentId) => commentId.id);
+  commentsId = this.comments.reduce((acc, { id }) => {
+    acc.push(id);
+    return acc;
+  }, []);
+
   #movies = Array.from({length: 12}, (index) => {
     const commentsList = [];
 
