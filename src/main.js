@@ -1,7 +1,8 @@
 import UserRank from '../src/view/user-rank-view.js';
 import Sort from '../src/view/sort-view.js';
 import FooterInfo from '../src/view/footer-info';
-import {render} from './render.js';
+// import {render} from './render.js';
+import {render} from './framework/render.js';
 import ContentPresenter from './presenter/content-presenter.js';
 import MovieModel from './model/movie-model.js';
 
