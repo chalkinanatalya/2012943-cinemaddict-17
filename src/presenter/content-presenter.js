@@ -91,9 +91,10 @@ export default class ContentPresenter {
   };
 
   #renderCard = (cardList, place) => {
+    const renderPlace = place.element.querySelector('.films-list__container');
     for(let i = 0; i < cardList.length; i++) {
       const filmCard = new FilmCard(cardList[i]);
-      render(filmCard, place.element.querySelector('.films-list__container'));
+      render(filmCard, renderPlace);
       this.#renderPopup(filmCard);
     }
   };
