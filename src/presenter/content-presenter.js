@@ -1,5 +1,4 @@
 import FilmContainer from '../view/film-container-view.js';
-// import {render} from '../render.js';
 import {render, remove} from '../framework/render.js';
 import FilmContainerList from '../view/film-container-list-view.js';
 import FilmCard from '../view/film-card-view.js';
@@ -60,8 +59,8 @@ export default class ContentPresenter {
   };
 
 
-  #renderPopup = (filmCard, counter) => {
-    const filmInfoPopup = new FilmInfoPopup(this.#filmCards[counter], this.#commentContainer);
+  #renderPopup = (filmCard) => {
+    const filmInfoPopup = new FilmInfoPopup(filmCard.movie, this.#commentContainer);
 
     const setListeners = () => {
       const closePopup = () => {
@@ -92,10 +91,11 @@ export default class ContentPresenter {
   };
 
   #renderCard = (cardList, place) => {
+    const renderPlace = place.element.querySelector('.films-list__container');
     for(let i = 0; i < cardList.length; i++) {
       const filmCard = new FilmCard(cardList[i]);
-      render(filmCard, place.element.querySelector('.films-list__container'));
-      this.#renderPopup(filmCard, i);
+      render(filmCard, renderPlace);
+      this.#renderPopup(filmCard);
     }
   };
 
