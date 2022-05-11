@@ -1,5 +1,5 @@
-import { createElement } from '../render';
 import {makeControlClass} from '../utils.js';
+import AbstractView from '../framework/view/abstract-stateful-view.js';
 
 const createFilmInfoPopupTemplate = (movie, comments) => {
   const {filmInfo, userDetails} = movie;
@@ -123,11 +123,11 @@ const createFilmInfoPopupTemplate = (movie, comments) => {
   );
 };
 
-export default class FilmInfoPopup {
-  #element = null;
+export default class FilmInfoPopup extends AbstractView {
   #movie = null;
   #comments = null;
   constructor(movie, comments) {
+    super();
     this.#movie = movie;
     this.#comments = comments;
   }
@@ -136,15 +136,12 @@ export default class FilmInfoPopup {
     return createFilmInfoPopupTemplate(this.#movie, this.#comments);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  hidePopupClickHandler = (callback) => {
+    this._callback.hideClick = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#hideClickHandler);
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #hideClickHandler = () => {
+    this._callback.hideClick();
+  };
 }

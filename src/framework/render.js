@@ -75,6 +75,7 @@ const remove = (component) => {
 
   component.element.remove();
   component.removeElement();
+
 };
 
 export {RenderPosition, createElement, render, replace, remove};

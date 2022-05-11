@@ -1,4 +1,4 @@
-import { createElement } from '../render';
+import AbstractView from '../framework/view/abstract-stateful-view.js';
 
 const createMenuTemplate = (watchlist, alreadyWatched, favorite) => (
 
@@ -10,22 +10,8 @@ const createMenuTemplate = (watchlist, alreadyWatched, favorite) => (
   </nav>`
 );
 
-export default class Menu {
-  #element = null;
-
+export default class Menu extends AbstractView {
   get template() {
     return createMenuTemplate(this.watchlist, this.alreadyWatched, this.favorite);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

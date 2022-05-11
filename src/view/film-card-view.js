@@ -1,5 +1,5 @@
-import { createElement } from '../render';
 import {makeControlClass} from '../utils.js';
+import AbstractView from '../framework/view/abstract-stateful-view.js';
 
 const createCardTemplate = (movie) => {
   const {filmInfo, userDetails} = movie;
@@ -30,11 +30,11 @@ const createCardTemplate = (movie) => {
   );
 };
 
-export default class FilmCard {
-  #element = null;
+export default class FilmCard extends AbstractView {
   #movie = null;
 
   constructor(movie) {
+    super();
     this.#movie = movie;
   }
 
@@ -42,15 +42,12 @@ export default class FilmCard {
     return createCardTemplate(this.#movie);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  showPopupClickHandler = (callback) => {
+    this._callback.showClick = callback;
+    this.element.querySelector('.film-card__link').addEventListener('click', this.#showClickHandler);
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #showClickHandler = () => {
+    this._callback.showClick();
+  };
 }
