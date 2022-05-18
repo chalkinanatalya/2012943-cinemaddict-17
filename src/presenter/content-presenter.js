@@ -1,16 +1,15 @@
 import FilmContainer from '../view/film-container-view.js';
-import {render, remove} from '../framework/render.js';
+import {render} from '../framework/render.js';
 import FilmContainerList from '../view/film-container-list-view.js';
-import FilmCard from '../view/film-card-view.js';
 import ShowMoreButton from '../view/show-more-button-view.js';
 import TopRated from '../view/top-rated.js';
 import MostCommented from '../view/most-commented.js';
-import FilmInfoPopup from '../view/film-info-popup-view.js';
 import Menu from '../view/menu-view.js';
 import NoFilmView from '../view/no-film-view.js';
+import FilmCardPresenter from '../presenter/film-card-presenter.js';
+import {rerenderCard} from '../utils.js';
 
 const CARD_OUTPUT_AT_ONCE = 5;
-const BODY = document.querySelector('body');
 
 export default class ContentPresenter {
   #headerContainer = null;
@@ -35,7 +34,11 @@ export default class ContentPresenter {
   }
 
   init = () => {
-    this.#filmCards = [...this.#movieModel.movies];
+    const movieCards = [...this.#movieModel.movies];
+    for(let i = 0; i < movieCards.length; i++) {
+      this.#filmCards[i] = new FilmCardPresenter(movieCards[i], this.#handleCardChange, this.#popupDelete);
+    }
+
     this.#commentContainer = [...this.#movieModel.comments];
 
     this.#renderMenu();
@@ -47,7 +50,7 @@ export default class ContentPresenter {
   #handleShowMoreButtonClick = () => {
     const filmCards = this.#filmCards
       .slice(this.#renderOutputFilmCount, this.#renderOutputFilmCount + CARD_OUTPUT_AT_ONCE);
-    this.#renderCard(filmCards,
+    this.#renderCards(filmCards,
       this.#filmContainerList);
 
     this.#renderOutputFilmCount += CARD_OUTPUT_AT_ONCE;
@@ -58,46 +61,13 @@ export default class ContentPresenter {
     }
   };
 
-
-  #renderPopup = (filmCard) => {
-    const filmInfoPopup = new FilmInfoPopup(filmCard.movie, this.#commentContainer);
-
-    const setListeners = () => {
-      const closePopup = () => {
-        BODY.classList.remove('hide-overflow');
-        remove(filmInfoPopup);
-      };
-
-      const onEscKeyDown = (evt) => {
-        if (evt.key === 'Escape' || evt.key === 'Esc') {
-          evt.preventDefault();
-          closePopup();
-        }
-      };
-
-      document.removeEventListener('keydown', onEscKeyDown);
-      filmInfoPopup.hidePopupClickHandler(closePopup);
-      document.addEventListener('keydown', onEscKeyDown);
-    };
-
-    const openPopup = () => {
-      BODY.classList.add('hide-overflow');
-      render(filmInfoPopup, this.#footerContainer);
-      setListeners();
-    };
-
-    filmCard.showPopupClickHandler(openPopup);
-
-  };
-
-  #renderCard = (cardList, place) => {
+  #renderCards = (cardList, place) => {
     const renderPlace = place.element.querySelector('.films-list__container');
     for(let i = 0; i < cardList.length; i++) {
-      const filmCard = new FilmCard(cardList[i]);
-      render(filmCard, renderPlace);
-      this.#renderPopup(filmCard);
+      cardList[i].init(renderPlace, this.#commentContainer);
     }
   };
+
 
   #renderMenu = () => {
     const menu = new Menu();
@@ -125,20 +95,39 @@ export default class ContentPresenter {
 
     render(this.#showMoreButton, this.#filmContainerList.element);
 
-    this.#renderCard(filmCards, this.#filmContainerList);
+    this.#renderCards(filmCards, this.#filmContainerList);
     this.#renderShowMoreButton();
   };
 
   #renderTopRated = () => {
     const topRated = new TopRated();
     render(topRated, this.#filmContainer.element);
-    this.#renderCard(this.#filmCards.slice(0, 2), topRated);
+    this.#renderCards(this.#filmCards.slice(0, 2), topRated);
   };
 
   #renderMostCommented = () => {
     const mostCommented = new MostCommented();
     render(mostCommented, this.#filmContainer.element);
-    this.#renderCard(this.#filmCards.slice(0, 2), mostCommented);
+    this.#renderCards(this.#filmCards.slice(0, 2), mostCommented);
+  };
+
+  #handleCardChange = (movie, userDetail, filmCard) => {
+    if(movie.userDetails[userDetail]) {
+      movie.userDetails[userDetail] = false;
+      filmCard.setUserDetails(userDetail, false);
+      rerenderCard(filmCard, userDetail);
+    } else {
+      movie.userDetails[userDetail] = true;
+      filmCard.setUserDetails(userDetail, true);
+      rerenderCard(filmCard, userDetail);
+    }
+  };
+
+  #popupDelete =() => {
+    const popup = document.querySelector('.film-details');
+    if(popup) {
+      popup.remove();
+    }
   };
 
 }

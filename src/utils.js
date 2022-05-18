@@ -1,4 +1,7 @@
 import dayjs from 'dayjs';
+
+const CARDACTIVE = 'film-card__controls-item--active';
+const POPUPACTIVE = 'film-details__control-button--active';
 // Функция из интернета по генерации случайного числа из диапазона
 // Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
 const getRandomInteger = (a = 0, b = 1) => {
@@ -26,11 +29,39 @@ const getRandomDate = () => {
 
 };
 
-const makeControlClass = (controlItem) => {
+const makeControlClass = (controlItem, cardType) => {
   if(controlItem) {
-    return 'film-card__controls-item--active';
+    if(cardType === 'separate') {
+      return CARDACTIVE;
+    } else {
+      return POPUPACTIVE;
+    }
   }
 };
 
+const rerenderCard = (card, userDetail) => {
+  if(userDetail === 'alreadyWatched') {userDetail = 'watched';}
+  const cardElements = document.querySelectorAll(`.${card.movie.id}`);
+  cardElements.forEach((cardElement) => {
+    const button = cardElement.querySelector(`[class*="${userDetail}"]`);
+    if(!button.hasAttribute('name')) {
+      if(button.classList.contains(CARDACTIVE)) {
+        button.classList.remove(CARDACTIVE);
+      } else {
+        button.classList.add(CARDACTIVE);
+      }
+    } else {
+      if(button.classList.contains(POPUPACTIVE)) {
+        button.classList.remove(POPUPACTIVE);
+      } else {
+        button.classList.add(POPUPACTIVE);
+      }
+    }
+  });
+  // const prevElement = card.element;
+  // const parent = prevElement.parentElement;
+  // card.removeElement(card);
+  // parent.replaceChild(card.element, prevElement);
+};
 
-export {getRandomInteger, getRandomSubjects, humanizeTaskDueDate, getRandomDate, makeControlClass};
+export {getRandomInteger, getRandomSubjects, humanizeTaskDueDate, getRandomDate, makeControlClass, rerenderCard};
