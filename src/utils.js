@@ -2,6 +2,9 @@ import dayjs from 'dayjs';
 
 const CARDACTIVE = 'film-card__controls-item--active';
 const POPUPACTIVE = 'film-details__control-button--active';
+const CARDCONTAINER = 'cardContainer';
+const POPUPCONTAINER = 'popupContainer';
+
 // Функция из интернета по генерации случайного числа из диапазона
 // Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
 const getRandomInteger = (a = 0, b = 1) => {
@@ -31,37 +34,41 @@ const getRandomDate = () => {
 
 const makeControlClass = (controlItem, cardType) => {
   if(controlItem) {
-    if(cardType === 'separate') {
+    if(cardType === CARDCONTAINER) {
       return CARDACTIVE;
-    } else {
+    } else if(cardType === POPUPCONTAINER) {
       return POPUPACTIVE;
     }
   }
 };
 
-const rerenderCard = (card, userDetail) => {
-  if(userDetail === 'alreadyWatched') {userDetail = 'watched';}
-  const cardElements = document.querySelectorAll(`.${card.movie.id}`);
-  cardElements.forEach((cardElement) => {
-    const button = cardElement.querySelector(`[class*="${userDetail}"]`);
-    if(!button.hasAttribute('name')) {
-      if(button.classList.contains(CARDACTIVE)) {
-        button.classList.remove(CARDACTIVE);
-      } else {
-        button.classList.add(CARDACTIVE);
-      }
-    } else {
-      if(button.classList.contains(POPUPACTIVE)) {
-        button.classList.remove(POPUPACTIVE);
-      } else {
-        button.classList.add(POPUPACTIVE);
-      }
-    }
-  });
-  // const prevElement = card.element;
-  // const parent = prevElement.parentElement;
-  // card.removeElement(card);
-  // parent.replaceChild(card.element, prevElement);
+const copy = (oldObj) => {
+  const newObj = JSON.parse(JSON.stringify(oldObj));
+  return newObj;
 };
 
-export {getRandomInteger, getRandomSubjects, humanizeTaskDueDate, getRandomDate, makeControlClass, rerenderCard};
+const reverse = (movie, userDetail) => {
+  const changedMovie = copy(movie);
+  changedMovie.userDetails[userDetail] = !changedMovie.userDetails[userDetail];
+  return changedMovie;
+};
+
+const findCards = (array, {searchType, data}) => {
+  const newCardList = [];
+  for(let i = 0; i < array.length; i++) {
+    if(searchType === 'id') {
+      const newCard = array[i].find((filmCard) => filmCard.movie.id === data);
+      if(newCard) {
+        newCardList.push(newCard);
+      }
+    } else {
+      const newCard = array[i].find((filmCard) => filmCard.isPopupOpened === data);
+      if(newCard) {
+        newCardList.push(newCard);
+      }
+    }
+  }
+  return newCardList;
+};
+
+export {getRandomInteger, getRandomSubjects, humanizeTaskDueDate, getRandomDate, makeControlClass, reverse, copy, findCards};

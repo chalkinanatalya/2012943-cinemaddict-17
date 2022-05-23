@@ -1,5 +1,5 @@
 import FilmContainer from '../view/film-container-view.js';
-import {render} from '../framework/render.js';
+import {render, remove} from '../framework/render.js';
 import FilmContainerList from '../view/film-container-list-view.js';
 import ShowMoreButton from '../view/show-more-button-view.js';
 import TopRated from '../view/top-rated.js';
@@ -7,7 +7,7 @@ import MostCommented from '../view/most-commented.js';
 import Menu from '../view/menu-view.js';
 import NoFilmView from '../view/no-film-view.js';
 import FilmCardPresenter from '../presenter/film-card-presenter.js';
-import {rerenderCard} from '../utils.js';
+import {reverse, findCards} from '../utils.js';
 
 const CARD_OUTPUT_AT_ONCE = 5;
 
@@ -24,6 +24,8 @@ export default class ContentPresenter {
   #showMoreButton = new ShowMoreButton();
 
   #filmCards = [];
+  #filmCardsTopRated = [];
+  #filmCardsMostCommented = [];
   #renderOutputFilmCount = CARD_OUTPUT_AT_ONCE;
 
   constructor(headerContainer, mainContainer, movieModel, footerContainer) {
@@ -37,6 +39,10 @@ export default class ContentPresenter {
     const movieCards = [...this.#movieModel.movies];
     for(let i = 0; i < movieCards.length; i++) {
       this.#filmCards[i] = new FilmCardPresenter(movieCards[i], this.#handleCardChange, this.#popupDelete);
+      if(i < 2) {
+        this.#filmCardsTopRated[i] = new FilmCardPresenter(movieCards[i], this.#handleCardChange, this.#popupDelete);
+        this.#filmCardsMostCommented[i] = new FilmCardPresenter(movieCards[i], this.#handleCardChange, this.#popupDelete);
+      }
     }
 
     this.#commentContainer = [...this.#movieModel.comments];
@@ -67,7 +73,6 @@ export default class ContentPresenter {
       cardList[i].init(renderPlace, this.#commentContainer);
     }
   };
-
 
   #renderMenu = () => {
     const menu = new Menu();
@@ -102,31 +107,34 @@ export default class ContentPresenter {
   #renderTopRated = () => {
     const topRated = new TopRated();
     render(topRated, this.#filmContainer.element);
-    this.#renderCards(this.#filmCards.slice(0, 2), topRated);
+    this.#renderCards(this.#filmCardsTopRated, topRated);
   };
 
   #renderMostCommented = () => {
     const mostCommented = new MostCommented();
     render(mostCommented, this.#filmContainer.element);
-    this.#renderCards(this.#filmCards.slice(0, 2), mostCommented);
+    this.#renderCards(this.#filmCardsMostCommented, mostCommented);
   };
 
-  #handleCardChange = (movie, userDetail, filmCard) => {
-    if(movie.userDetails[userDetail]) {
-      movie.userDetails[userDetail] = false;
-      filmCard.setUserDetails(userDetail, false);
-      rerenderCard(filmCard, userDetail);
-    } else {
-      movie.userDetails[userDetail] = true;
-      filmCard.setUserDetails(userDetail, true);
-      rerenderCard(filmCard, userDetail);
+  #handleCardChange = (movie, userDetail) => {
+    const changedMovie = reverse(movie, userDetail);
+
+    let isPopupOpened = false;
+    if (findCards([this.#filmCards, this.#filmCardsTopRated, this.#filmCardsMostCommented], {searchType: 'popup', data: true}).length) {
+      isPopupOpened = true;
+    }
+
+    findCards([this.#filmCards, this.#filmCardsTopRated, this.#filmCardsMostCommented], {searchType: 'id', data: movie.id}).forEach((card) => card.init(0, 0, changedMovie));
+    if(isPopupOpened) {
+      this.#filmCards.find((filmCard) => filmCard.movie.id === movie.id).openPopup();
     }
   };
 
   #popupDelete =() => {
-    const popup = document.querySelector('.film-details');
-    if(popup) {
-      popup.remove();
+    const oldPopup = findCards([this.#filmCards, this.#filmCardsTopRated, this.#filmCardsMostCommented], {searchType: 'popup', data: true});
+    if(oldPopup[0]) {
+      remove(oldPopup[0].filmInfoPopup);
+      oldPopup[0].changeIsPopupOpened(false);
     }
   };
 

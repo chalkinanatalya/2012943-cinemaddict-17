@@ -1,8 +1,6 @@
-import {render, remove} from '../framework/render.js';
+import {render, remove, replace} from '../framework/render.js';
 import FilmCard from '../view/film-card-view.js';
 import FilmInfoPopup from '../view/film-info-popup-view.js';
-
-const BODY = document.querySelector('body');
 
 export default class FilmCardPresenter {
   #movie = null;
@@ -10,6 +8,8 @@ export default class FilmCardPresenter {
   #filmCard = null;
   #commentContainer = null;
   #popupDelete = null;
+  #filmInfoPopup = null;
+  #isPopupOpened = null;
 
   constructor(movie, changeData, popupDelete) {
     this.#movie = movie;
@@ -17,62 +17,90 @@ export default class FilmCardPresenter {
     this.#popupDelete = popupDelete;
   }
 
+  get movie() {
+    return this.#movie;
+  }
+
+  get isPopupOpened() {
+    return this.#isPopupOpened;
+  }
+
+  get filmInfoPopup() {
+    return this.#filmInfoPopup;
+  }
+
+  changeIsPopupOpened = (state) => {
+    this.#isPopupOpened = state;
+  };
+
   #handleWatchlistClick = () => {
-    this.#changeData(this.#movie, 'watchlist', this.#filmCard);
+    this.#changeData(this.#movie, 'watchlist');
   };
 
   #handleWatchedClick = () => {
-    this.#changeData(this.#movie, 'alreadyWatched', this.#filmCard);
+    this.#changeData(this.#movie, 'alreadyWatched');
   };
 
   #handleFavoritelistClick = () => {
-    this.#changeData(this.#movie, 'favorite', this.#filmCard);
+    this.#changeData(this.#movie, 'favorite');
+  };
+
+  #setListeners = () => {
+    const closePopup = () => {
+      document.querySelector('body').classList.remove('hide-overflow');
+      remove(this.#filmInfoPopup);
+      this.#isPopupOpened = false;
+    };
+
+    const onEscKeyDown = (evt) => {
+      if (evt.key === 'Escape' || evt.key === 'Esc') {
+        evt.preventDefault();
+        closePopup();
+      }
+    };
+
+    document.removeEventListener('keydown', onEscKeyDown);
+    this.#filmInfoPopup.hidePopupClickHandler(closePopup);
+    document.addEventListener('keydown', onEscKeyDown);
+  };
+
+  #setFilmDetailsHandler = (film) => {
+    film.setWatchlistClickHandler(this.#handleWatchlistClick);
+    film.setWatchedClickHandler(this.#handleWatchedClick);
+    film.setFavoriteClickHandler(this.#handleFavoritelistClick);
+  };
+
+  openPopup = () => {
+    document.querySelector('body').classList.add('hide-overflow');
+    this.#popupDelete();
+    this.#isPopupOpened = true;
+    render(this.#filmInfoPopup, document.querySelector('.footer'));
+    this.#setListeners();
+    this.#setFilmDetailsHandler(this.#filmInfoPopup);
   };
 
   #renderPopup = () => {
-    const filmInfoPopup = new FilmInfoPopup(this.#movie, this.#commentContainer);
-
-    const setListeners = () => {
-      const closePopup = () => {
-        BODY.classList.remove('hide-overflow');
-        remove(filmInfoPopup);
-      };
-
-      const onEscKeyDown = (evt) => {
-        if (evt.key === 'Escape' || evt.key === 'Esc') {
-          evt.preventDefault();
-          closePopup();
-        }
-      };
-
-      document.removeEventListener('keydown', onEscKeyDown);
-      filmInfoPopup.hidePopupClickHandler(closePopup);
-      document.addEventListener('keydown', onEscKeyDown);
-    };
-
-    const openPopup = () => {
-      BODY.classList.add('hide-overflow');
-      const footerContainer = document.querySelector('.footer');
-      this.#popupDelete();
-      render(filmInfoPopup, footerContainer);
-      setListeners();
-      filmInfoPopup.setWatchlistClickHandler(this.#handleWatchlistClick);
-      filmInfoPopup.setWatchedClickHandler(this.#handleWatchedClick);
-      filmInfoPopup.setFavoriteClickHandler(this.#handleFavoritelistClick);
-    };
-
-    this.#filmCard.showPopupClickHandler(openPopup);
+    this.#filmInfoPopup = new FilmInfoPopup(this.#movie, this.#commentContainer);
+    this.#filmCard.showPopupClickHandler(this.openPopup);
   };
 
-  init = (renderPlace, commentContainer) => {
-    this.#filmCard = new FilmCard(this.#movie);
-    this.#commentContainer = commentContainer;
-    render(this.#filmCard, renderPlace);
+  init = (renderPlace, commentContainer, movie = 0) => {
+    if(movie) {
+      this.#movie = movie;
+      const oldFilmCard = this.#filmCard;
+      const newFilmCard = new FilmCard(this.#movie);
+      replace(newFilmCard, oldFilmCard);
+      this.#filmCard = newFilmCard;
+      this.#popupDelete();
+    } else {
+      this.#commentContainer = commentContainer;
+      this.#filmCard = new FilmCard(this.#movie);
+      render(this.#filmCard, renderPlace);
+    }
+
     this.#renderPopup();
 
-    this.#filmCard.setWatchlistClickHandler(this.#handleWatchlistClick);
-    this.#filmCard.setWatchedClickHandler(this.#handleWatchedClick);
-    this.#filmCard.setFavoriteClickHandler(this.#handleFavoritelistClick);
+    this.#setFilmDetailsHandler(this.#filmCard);
   };
 
 }

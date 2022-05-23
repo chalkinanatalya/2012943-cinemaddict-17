@@ -1,6 +1,8 @@
 import {makeControlClass} from '../utils.js';
 import AbstractView from '../framework/view/abstract-stateful-view.js';
 
+const CONTAINER = 'cardContainer';
+
 const createCardTemplate = (movie) => {
   const {filmInfo, userDetails} = movie;
 
@@ -22,9 +24,9 @@ const createCardTemplate = (movie) => {
     <span class="film-card__comments">89 comments</span>
   </a>
   <div class="film-card__controls">
-    <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${makeControlClass(watchlist, 'separate')}" type="button">Add to watchlist</button>
-    <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${makeControlClass(watchedFilm, 'separate')}" type="button">Mark as watched</button>
-    <button class="film-card__controls-item film-card__controls-item--favorite ${makeControlClass(favorite, 'separate')}" type="button">Mark as favorite</button>
+    <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${makeControlClass(watchlist, CONTAINER)}" type="button">Add to watchlist</button>
+    <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${makeControlClass(watchedFilm, CONTAINER)}" type="button">Mark as watched</button>
+    <button class="film-card__controls-item film-card__controls-item--favorite ${makeControlClass(favorite, CONTAINER)}" type="button">Mark as favorite</button>
   </div>
 </article>`
   );

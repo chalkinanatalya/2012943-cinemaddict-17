@@ -1,6 +1,8 @@
 import {makeControlClass} from '../utils.js';
 import AbstractView from '../framework/view/abstract-stateful-view.js';
 
+const CONTAINER = 'popupContainer';
+
 const createFilmInfoPopupTemplate = (movie, comments) => {
   const {filmInfo, userDetails} = movie;
   const watchlist = userDetails.watchlist;
@@ -73,9 +75,9 @@ const createFilmInfoPopupTemplate = (movie, comments) => {
       </div>
 
       <section class="film-details__controls">
-        <button type="button" class="film-details__control-button film-details__control-button--watchlist ${makeControlClass(watchlist, 'popup')}" id="watchlist" name="watchlist">Add to watchlist</button>
-        <button type="button" class="film-details__control-button film-details__control-button--watched ${makeControlClass(watchedFilm, 'popup')}" id="watched" name="watched">Already watched</button>
-        <button type="button" class="film-details__control-button film-details__control-button--favorite ${makeControlClass(favorite, 'popup')}" id="favorite" name="favorite">Add to favorites</button>
+        <button type="button" class="film-details__control-button film-details__control-button--watchlist ${makeControlClass(watchlist, CONTAINER)}" id="watchlist" name="watchlist">Add to watchlist</button>
+        <button type="button" class="film-details__control-button film-details__control-button--watched ${makeControlClass(watchedFilm, CONTAINER)}" id="watched" name="watched">Already watched</button>
+        <button type="button" class="film-details__control-button film-details__control-button--favorite ${makeControlClass(favorite, CONTAINER)}" id="favorite" name="favorite">Add to favorites</button>
       </section>
     </div>
     <div class="film-details__bottom-container">
@@ -125,6 +127,7 @@ const createFilmInfoPopupTemplate = (movie, comments) => {
 export default class FilmInfoPopup extends AbstractView {
   #movie = null;
   #comments = null;
+
   constructor(movie, comments) {
     super();
     this.#movie = movie;
