@@ -1,5 +1,6 @@
 import {getRandomInteger, getRandomSubjects, getRandomDate} from '../utils.js';
 import {POSTERS, MOCKTEXTLONG, MOCKTEXTSHORT} from '../const.js';
+import { nanoid } from 'nanoid';
 
 const getRandomTime = () => {
   const hours = getRandomInteger(0, 12);
@@ -13,7 +14,7 @@ const getRandomTime = () => {
 
 export const generateMovie = (commentsList) => (
   {
-    id: getRandomInteger(1, 1000),
+    id: `s${nanoid()}`,
     comments: commentsList,
     filmInfo: {
       title: MOCKTEXTLONG,
@@ -33,10 +34,10 @@ export const generateMovie = (commentsList) => (
       description: MOCKTEXTLONG
     },
     userDetails: {
-      watchlist: Boolean(getRandomInteger(0, 1)),
-      alreadyWatched: Boolean(getRandomInteger(0, 1)),
+      watchlist: false,
+      alreadyWatched: false,
       watchingDate: getRandomDate(),
-      favorite: Boolean(getRandomInteger(0, 1)),
+      favorite: false,
     }
 
   }

@@ -1,4 +1,10 @@
 import dayjs from 'dayjs';
+
+const CARDACTIVE = 'film-card__controls-item--active';
+const POPUPACTIVE = 'film-details__control-button--active';
+const CARDCONTAINER = 'cardContainer';
+const POPUPCONTAINER = 'popupContainer';
+
 // Функция из интернета по генерации случайного числа из диапазона
 // Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
 const getRandomInteger = (a = 0, b = 1) => {
@@ -26,11 +32,43 @@ const getRandomDate = () => {
 
 };
 
-const makeControlClass = (controlItem) => {
+const makeControlClass = (controlItem, cardType) => {
   if(controlItem) {
-    return 'film-card__controls-item--active';
+    if(cardType === CARDCONTAINER) {
+      return CARDACTIVE;
+    } else if(cardType === POPUPCONTAINER) {
+      return POPUPACTIVE;
+    }
   }
 };
 
+const copy = (oldObj) => {
+  const newObj = JSON.parse(JSON.stringify(oldObj));
+  return newObj;
+};
 
-export {getRandomInteger, getRandomSubjects, humanizeTaskDueDate, getRandomDate, makeControlClass};
+const reverse = (movie, userDetail) => {
+  const changedMovie = copy(movie);
+  changedMovie.userDetails[userDetail] = !changedMovie.userDetails[userDetail];
+  return changedMovie;
+};
+
+const findCards = (array, {searchType, data}) => {
+  const newCardList = [];
+  for(let i = 0; i < array.length; i++) {
+    if(searchType === 'id') {
+      const newCard = array[i].find((filmCard) => filmCard.movie.id === data);
+      if(newCard) {
+        newCardList.push(newCard);
+      }
+    } else {
+      const newCard = array[i].find((filmCard) => filmCard.isPopupOpened === data);
+      if(newCard) {
+        newCardList.push(newCard);
+      }
+    }
+  }
+  return newCardList;
+};
+
+export {getRandomInteger, getRandomSubjects, humanizeTaskDueDate, getRandomDate, makeControlClass, reverse, copy, findCards};
