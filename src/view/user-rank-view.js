@@ -7,7 +7,7 @@ const createUserRankTemplate = () => (
   </section>`
 );
 
-export default class UserRank extends AbstractView {
+export default class UserRankView extends AbstractView {
   get template() {
     return createUserRankTemplate();
   }
