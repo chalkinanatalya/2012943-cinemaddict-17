@@ -29,6 +29,10 @@ export default class FilmCardPresenter {
     return this.#filmInfoPopup;
   }
 
+  get filmCard() {
+    return this.#filmCard;
+  }
+
   changeIsPopupOpened = (state) => {
     this.#isPopupOpened = state;
   };

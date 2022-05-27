@@ -7,7 +7,8 @@ import MostCommented from '../view/most-commented.js';
 import Menu from '../view/menu-view.js';
 import NoFilmView from '../view/no-film-view.js';
 import FilmCardPresenter from '../presenter/film-card-presenter.js';
-import {reverse, findCards} from '../utils.js';
+import {reverse, findCards, dateComarison} from '../utils.js';
+import SortView from '../view/sort-view.js';
 
 const CARD_OUTPUT_AT_ONCE = 5;
 
@@ -27,6 +28,7 @@ export default class ContentPresenter {
   #filmCardsTopRated = [];
   #filmCardsMostCommented = [];
   #renderOutputFilmCount = CARD_OUTPUT_AT_ONCE;
+  #sortType = 'default';
 
   constructor(headerContainer, mainContainer, movieModel, footerContainer) {
     this.#headerContainer = headerContainer;
@@ -75,12 +77,43 @@ export default class ContentPresenter {
   };
 
   #renderMenu = () => {
+    const sort = new SortView();
+    sort.setSortByOption(this.#sortByOption);
     const menu = new Menu();
     menu.watchlist = this.#movieModel.calculateValues('watchlist');
     menu.alreadyWatched = this.#movieModel.calculateValues('alreadyWatched');
     menu.favorite = this.#movieModel.calculateValues('favorite');
 
     render(menu, this.#mainContainer, 'beforebegin');
+    render(sort, this.#mainContainer, 'beforebegin');
+  };
+
+  #sortCards = (sortType) => {
+    if(sortType !== this.#sortType) {
+      this.#renderOutputFilmCount = CARD_OUTPUT_AT_ONCE;
+      for(let i = 0; i < this.#filmCards.length; i++) {
+        if(this.#filmCards[i].filmCard) {
+          this.#filmCards[i].filmCard.element.remove();
+        }
+      }
+
+      if(sortType === 'date') {
+        this.#filmCards.sort((firstDate, secondDate) => (dateComarison(firstDate.movie.filmInfo.release.date, secondDate.movie.filmInfo.release.date)) ? 1 : -1);
+      } else if(sortType === 'raiting') {
+        this.#filmCards.sort((firstDate, secondDate) => (firstDate.movie.filmInfo.totalRaiting < secondDate.movie.filmInfo.totalRaiting) ? 1 : -1);
+      } else if(sortType === 'default') {
+        const movieCards = [...this.#movieModel.movies];
+        for(let i = 0; i < movieCards.length; i++) {
+          this.#filmCards[i] = new FilmCardPresenter(movieCards[i], this.#handleCardChange, this.#popupDelete);
+        }
+      }
+      this.#sortType = sortType;
+      this.#renderMovieContainer();
+    }
+  };
+
+  #sortByOption = (evt) => {
+    this.#sortCards(evt.target.dataset.sort);
   };
 
   #renderShowMoreButton = () => {
@@ -95,7 +128,7 @@ export default class ContentPresenter {
     if(!this.#filmCards.length) {
       render(this.#noFilm, filmElement);
     } else {
-      render(this.#filmContainerList, filmElement);
+      render(this.#filmContainerList, filmElement, 'afterbegin');
     }
 
     render(this.#showMoreButton, this.#filmContainerList.element);

@@ -29,7 +29,18 @@ const getRandomDate = () => {
 
   const randomDay = new Date(year, month, day);
   return dayjs(randomDay).format('DD/MM/YYYY');
+};
 
+const reverseDate = (date) => {
+  const [day, month, year] = date.split('/');
+  return `${month}/${day}/${year}`;
+};
+
+const dateComarison = (firstDateStr, secondDateStr) => {
+  const firstDate = dayjs(reverseDate(firstDateStr), 'MM/DD/YYYY');
+  const secondDate = dayjs(reverseDate(secondDateStr), 'MM/DD/YYYY');
+
+  return firstDate.isBefore(secondDate);
 };
 
 const makeControlClass = (controlItem, cardType) => {
@@ -71,4 +82,4 @@ const findCards = (array, {searchType, data}) => {
   return newCardList;
 };
 
-export {getRandomInteger, getRandomSubjects, humanizeTaskDueDate, getRandomDate, makeControlClass, reverse, copy, findCards};
+export {getRandomInteger, getRandomSubjects, humanizeTaskDueDate, getRandomDate, makeControlClass, reverse, copy, findCards, dateComarison};
