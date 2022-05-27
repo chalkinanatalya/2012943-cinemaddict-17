@@ -78,9 +78,7 @@ export default class ContentPresenter {
 
   #renderMenu = () => {
     const sort = new SortView();
-    sort.setSortByDefault(this.#sortByDefaultHandler);
-    sort.setSortByDate(this.#sortByDateHandler);
-    sort.setSortByRaiting(this.#sortByRaitingHandler);
+    sort.setSortByOption(this.#sortByOption);
     const menu = new Menu();
     menu.watchlist = this.#movieModel.calculateValues('watchlist');
     menu.alreadyWatched = this.#movieModel.calculateValues('alreadyWatched');
@@ -101,31 +99,21 @@ export default class ContentPresenter {
 
       if(sortType === 'date') {
         this.#filmCards.sort((firstDate, secondDate) => (dateComarison(firstDate.movie.filmInfo.release.date, secondDate.movie.filmInfo.release.date)) ? 1 : -1);
-        this.#sortType = 'date';
       } else if(sortType === 'raiting') {
         this.#filmCards.sort((firstDate, secondDate) => (firstDate.movie.filmInfo.totalRaiting < secondDate.movie.filmInfo.totalRaiting) ? 1 : -1);
-        this.#sortType = 'raiting';
       } else if(sortType === 'default') {
         const movieCards = [...this.#movieModel.movies];
         for(let i = 0; i < movieCards.length; i++) {
           this.#filmCards[i] = new FilmCardPresenter(movieCards[i], this.#handleCardChange, this.#popupDelete);
         }
-        this.#sortType = 'default';
       }
+      this.#sortType = sortType;
       this.#renderMovieContainer();
     }
   };
 
-  #sortByDefaultHandler = () => {
-    this.#sortCards('default');
-  };
-
-  #sortByDateHandler = () => {
-    this.#sortCards('date');
-  };
-
-  #sortByRaitingHandler = () => {
-    this.#sortCards('raiting');
+  #sortByOption = (evt) => {
+    this.#sortCards(evt.target.dataset.sort);
   };
 
   #renderShowMoreButton = () => {

@@ -13,32 +13,13 @@ export default class SortView extends AbstractView {
     return createSortTemplate();
   }
 
-  setSortByDefault = (callback) => {
-    this._callback.sortDefaultClick = callback;
-    this.element.querySelector('.sort__button[data-sort="default"]').addEventListener('click', this.#sortByDefault);
+  setSortByOption = (callback) => {
+    this._callback.sortOptionClick = callback;
+    this.element.querySelectorAll('.sort a').forEach((sortButton) => sortButton.addEventListener('click', this.#sortByOption));
   };
 
-  setSortByDate = (callback) => {
-    this._callback.sortDateClick = callback;
-    this.element.querySelector('.sort__button[data-sort="date"]').addEventListener('click', this.#sortByDate);
-  };
-
-
-  setSortByRaiting = (callback) => {
-    this._callback.sortRaitingClick = callback;
-    this.element.querySelector('.sort__button[data-sort="raiting"]').addEventListener('click', this.#sortByRaiting);
-  };
-
-  #sortByDefault = () => {
-    this._callback.sortDefaultClick();
-  };
-
-  #sortByDate = () => {
-    this._callback.sortDateClick();
-  };
-
-  #sortByRaiting = () => {
-    this._callback.sortRaitingClick();
+  #sortByOption = (evt) => {
+    this._callback.sortOptionClick(evt);
   };
 }
 
