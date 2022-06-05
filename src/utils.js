@@ -28,7 +28,7 @@ const getRandomDate = () => {
   }
 
   const randomDay = new Date(year, month, day);
-  return dayjs(randomDay).format('DD/MM/YYYY');
+  return dayjs(randomDay).format('MM/DD/YYYY');
 };
 
 const reverseDate = (date) => {
@@ -37,8 +37,8 @@ const reverseDate = (date) => {
 };
 
 const dateComarison = (firstDateStr, secondDateStr) => {
-  const firstDate = dayjs(reverseDate(firstDateStr), 'MM/DD/YYYY');
-  const secondDate = dayjs(reverseDate(secondDateStr), 'MM/DD/YYYY');
+  const firstDate = dayjs(firstDateStr, 'MM/DD/YYYY');
+  const secondDate = dayjs(secondDateStr, 'MM/DD/YYYY');
 
   return firstDate.isBefore(secondDate);
 };

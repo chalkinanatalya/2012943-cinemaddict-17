@@ -29,7 +29,7 @@ export const generateMovie = (commentsList) => (
         date: getRandomDate(),
         releaseCountry: MOCKTEXTSHORT,
       },
-      runTime: `${getRandomTime().hours}h ${getRandomTime().minutes}m`,
+      runTime: 500,
       genre: [MOCKTEXTSHORT],
       description: MOCKTEXTLONG
     },

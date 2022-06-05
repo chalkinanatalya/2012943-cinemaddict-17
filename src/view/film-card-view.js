@@ -1,7 +1,10 @@
 import {makeControlClass} from '../utils.js';
 import AbstractView from '../framework/view/abstract-view.js';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration.js';
 
 const CONTAINER = 'cardContainer';
+dayjs.extend(duration);
 
 const createCardTemplate = (movie) => {
   const {filmInfo, userDetails} = movie;
@@ -15,8 +18,8 @@ const createCardTemplate = (movie) => {
     <h3 class="film-card__title">${filmInfo.title}</h3>
     <p class="film-card__rating">${filmInfo.totalRaiting}</p>
     <p class="film-card__info">
-      <span class="film-card__year">${filmInfo.release.date}</span>
-      <span class="film-card__duration">${filmInfo.runTime}</span>
+      <span class="film-card__year">${dayjs(filmInfo.release.date).format('DD MMM YYYY')}</span>
+      <span class="film-card__duration">${dayjs.duration(filmInfo.runTime, 'minutes').format('HH[h] mm[m]')}</span>
       <span class="film-card__genre">${filmInfo.genre}</span>
     </p>
     <img src="./images/posters/${filmInfo.poster}" alt="" class="film-card__poster">

@@ -1,7 +1,10 @@
 import {makeControlClass, makeCheckedMark} from '../utils.js';
 import AbstractStateView from '../framework/view/abstract-stateful-view.js';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration.js';
 
 const CONTAINER = 'popupContainer';
+dayjs.extend(duration);
 
 const createFilmInfoPopupTemplate = (movie, comments, newComment) => {
   const {filmInfo, userDetails} = movie;
@@ -49,11 +52,11 @@ const createFilmInfoPopupTemplate = (movie, comments, newComment) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${filmInfo.release.date}</td>
+              <td class="film-details__cell">${dayjs(filmInfo.release.date).format('DD MMMM YYYY')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${filmInfo.runTime}</td>
+              <td class="film-details__cell">${dayjs.duration(filmInfo.runTime, 'minutes').format('HH[h] mm[m]')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
@@ -135,27 +138,11 @@ export default class FilmInfoPopup extends AbstractStateView {
     this.#comments = comments;
     this.#newComment = newComment;
 
-    //this._state = FilmInfoPopup.parsePopupToState(comments);
   }
 
   get template() {
     return createFilmInfoPopupTemplate(this.#movie, this.#comments, this.#newComment);
   }
-
-  // removeElement = () => {
-  //   super.removeElement();
-  // };
-
-  // reset = (comments) => {
-  //   this.updateElement(
-  //     FilmInfoPopup.parsePopupToState(comments),
-  //   );
-  // };
-
-  // parsePopupToState = (comments) => ({...comments,
-  //   isEmotion: comments.emotion !== null,
-  //   isComment: comments.comment !==null,
-  // });
 
   hidePopupClickHandler = (callback) => {
     this._callback.hideClick = callback;
