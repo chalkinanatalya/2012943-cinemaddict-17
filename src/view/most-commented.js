@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-stateful-view.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createMostCommentedTemplate = () =>(
   `<section class="films-list films-list--extra">

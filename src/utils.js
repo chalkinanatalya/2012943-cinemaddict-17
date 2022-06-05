@@ -53,6 +53,12 @@ const makeControlClass = (controlItem, cardType) => {
   }
 };
 
+const makeCheckedMark = (emotionType, value) => {
+  if(emotionType === value) {
+    return 'checked';
+  }
+};
+
 const copy = (oldObj) => {
   const newObj = JSON.parse(JSON.stringify(oldObj));
   return newObj;
@@ -82,4 +88,4 @@ const findCards = (array, {searchType, data}) => {
   return newCardList;
 };
 
-export {getRandomInteger, getRandomSubjects, humanizeTaskDueDate, getRandomDate, makeControlClass, reverse, copy, findCards, dateComarison};
+export {getRandomInteger, getRandomSubjects, humanizeTaskDueDate, getRandomDate, makeControlClass, reverse, copy, findCards, dateComarison, makeCheckedMark};

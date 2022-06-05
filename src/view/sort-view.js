@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-stateful-view.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createSortTemplate = () => (
   ` <ul class="sort">
@@ -22,5 +22,3 @@ export default class SortView extends AbstractView {
     this._callback.sortOptionClick(evt);
   };
 }
-
-

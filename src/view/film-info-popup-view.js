@@ -1,9 +1,9 @@
-import {makeControlClass} from '../utils.js';
-import AbstractView from '../framework/view/abstract-stateful-view.js';
+import {makeControlClass, makeCheckedMark} from '../utils.js';
+import AbstractStateView from '../framework/view/abstract-stateful-view.js';
 
 const CONTAINER = 'popupContainer';
 
-const createFilmInfoPopupTemplate = (movie, comments) => {
+const createFilmInfoPopupTemplate = (movie, comments, newComment) => {
   const {filmInfo, userDetails} = movie;
   const watchlist = userDetails.watchlist;
   const watchedFilm = userDetails.alreadyWatched;
@@ -88,30 +88,30 @@ const createFilmInfoPopupTemplate = (movie, comments) => {
 
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
-            <img src="images/emoji/${comments[0].emotion}.png" width="55" height="55" alt="emoji-smile">
+            <img src="images/emoji/${newComment.emotion}.png" width="55" height="55" alt="emoji-smile">
           </div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${comments[0].comment}</textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${newComment.comment}</textarea>
           </label>
 
           <div class="film-details__emoji-list">
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile" checked>
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile" ${makeCheckedMark(newComment.emotion, 'smile')}>
             <label class="film-details__emoji-label" for="emoji-smile">
               <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
             </label>
 
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping" ${makeCheckedMark(newComment.emotion, 'sleeping')}>
             <label class="film-details__emoji-label" for="emoji-sleeping">
               <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
             </label>
 
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke" ${makeCheckedMark(newComment.emotion, 'puke')}>
             <label class="film-details__emoji-label" for="emoji-puke">
               <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
             </label>
 
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry" ${makeCheckedMark(newComment.emotion, 'angry')}>
             <label class="film-details__emoji-label" for="emoji-angry">
               <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
             </label>
@@ -124,19 +124,38 @@ const createFilmInfoPopupTemplate = (movie, comments) => {
   );
 };
 
-export default class FilmInfoPopup extends AbstractView {
+export default class FilmInfoPopup extends AbstractStateView {
   #movie = null;
   #comments = null;
+  #newComment = null;
 
-  constructor(movie, comments) {
+  constructor(movie, comments, newComment) {
     super();
     this.#movie = movie;
     this.#comments = comments;
+    this.#newComment = newComment;
+
+    //this._state = FilmInfoPopup.parsePopupToState(comments);
   }
 
   get template() {
-    return createFilmInfoPopupTemplate(this.#movie, this.#comments);
+    return createFilmInfoPopupTemplate(this.#movie, this.#comments, this.#newComment);
   }
+
+  // removeElement = () => {
+  //   super.removeElement();
+  // };
+
+  // reset = (comments) => {
+  //   this.updateElement(
+  //     FilmInfoPopup.parsePopupToState(comments),
+  //   );
+  // };
+
+  // parsePopupToState = (comments) => ({...comments,
+  //   isEmotion: comments.emotion !== null,
+  //   isComment: comments.comment !==null,
+  // });
 
   hidePopupClickHandler = (callback) => {
     this._callback.hideClick = callback;
@@ -158,6 +177,11 @@ export default class FilmInfoPopup extends AbstractView {
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
   };
 
+  setEmotionClickHandler = (callback) => {
+    this._callback.emotionClick = callback;
+    this.element.querySelectorAll('.film-details__emoji-list input').forEach((emotionLabel) => emotionLabel.addEventListener('click', this.#emotionClickHandler));
+  };
+
   #watchlistClickHandler = () => {
     this._callback.watchlistClick();
   };
@@ -172,5 +196,9 @@ export default class FilmInfoPopup extends AbstractView {
 
   #hideClickHandler = () => {
     this._callback.hideClick();
+  };
+
+  #emotionClickHandler = (evt) => {
+    this._callback.emotionClick(evt);
   };
 }

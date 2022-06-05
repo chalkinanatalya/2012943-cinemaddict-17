@@ -16,7 +16,7 @@ export default class ContentPresenter {
   #headerContainer = null;
   #mainContainer = null;
   #movieModel = null;
-  #commentContainer = null;
+  #comments = null;
   #footerContainer = null;
 
   #filmContainer = new FilmContainer();
@@ -47,7 +47,7 @@ export default class ContentPresenter {
       }
     }
 
-    this.#commentContainer = [...this.#movieModel.comments];
+    this.#comments = [...this.#movieModel.comments];
 
     this.#renderMenu();
     this.#renderMovieContainer();
@@ -72,7 +72,7 @@ export default class ContentPresenter {
   #renderCards = (cardList, place) => {
     const renderPlace = place.element.querySelector('.films-list__container');
     for(let i = 0; i < cardList.length; i++) {
-      cardList[i].init(renderPlace, this.#commentContainer);
+      cardList[i].init(renderPlace, this.#comments);
     }
   };
 
