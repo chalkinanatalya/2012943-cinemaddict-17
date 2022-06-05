@@ -2,9 +2,11 @@ import {makeControlClass, makeCheckedMark} from '../utils.js';
 import AbstractStateView from '../framework/view/abstract-stateful-view.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration.js';
+import RelativeTime from 'dayjs/plugin/RelativeTime.js';
 
 const CONTAINER = 'popupContainer';
 dayjs.extend(duration);
+dayjs.extend(RelativeTime);
 
 const createFilmInfoPopupTemplate = (movie, comments, newComment) => {
   const {filmInfo, userDetails} = movie;
@@ -90,52 +92,52 @@ const createFilmInfoPopupTemplate = (movie, comments, newComment) => {
         <ul class="film-details__comments-list">
         <li class="film-details__comment">
         <span class="film-details__comment-emoji">
-          <img src="./images/emoji/smile.png" width="55" height="55" alt="emoji-smile">
+          <img src="./images/emoji/${comments[0].emotion}.png" width="55" height="55" alt="${comments[0].emotion}">
         </span>
         <div>
-          <p class="film-details__comment-text">Interesting setting and a good cast</p>
+          <p class="film-details__comment-text">${comments[0].comment}</p>
           <p class="film-details__comment-info">
-            <span class="film-details__comment-author">Tim Macoveev</span>
-            <span class="film-details__comment-day">2019/12/31 23:59</span>
+            <span class="film-details__comment-author">${comments[0].author}</span>
+            <span class="film-details__comment-day">${dayjs(comments[0].date).fromNow()}</span>
             <button class="film-details__comment-delete">Delete</button>
           </p>
         </div>
       </li>
       <li class="film-details__comment">
         <span class="film-details__comment-emoji">
-          <img src="./images/emoji/sleeping.png" width="55" height="55" alt="emoji-sleeping">
+          <img src="./images/emoji/${comments[1].emotion}.png" width="55" height="55" alt="${comments[1].emotion}">
         </span>
         <div>
-          <p class="film-details__comment-text">Booooooooooring</p>
+          <p class="film-details__comment-text">${comments[1].comment}</p>
           <p class="film-details__comment-info">
-            <span class="film-details__comment-author">John Doe</span>
-            <span class="film-details__comment-day">2 days ago</span>
+            <span class="film-details__comment-author">${comments[1].author}</span>
+            <span class="film-details__comment-day">${dayjs(comments[1].date).fromNow()}</span>
             <button class="film-details__comment-delete">Delete</button>
           </p>
         </div>
       </li>
       <li class="film-details__comment">
         <span class="film-details__comment-emoji">
-          <img src="./images/emoji/puke.png" width="55" height="55" alt="emoji-puke">
+          <img src="./images/emoji/${comments[2].emotion}.png" width="55" height="55" alt="${comments[2].emotion}">
         </span>
         <div>
-          <p class="film-details__comment-text">Very very old. Meh</p>
+          <p class="film-details__comment-text">${comments[2].comment}</p>
           <p class="film-details__comment-info">
-            <span class="film-details__comment-author">John Doe</span>
-            <span class="film-details__comment-day">2 days ago</span>
+            <span class="film-details__comment-author">${comments[2].author}</span>
+            <span class="film-details__comment-day">${dayjs(comments[2].date).fromNow()}</span>
             <button class="film-details__comment-delete">Delete</button>
           </p>
         </div>
       </li>
       <li class="film-details__comment">
         <span class="film-details__comment-emoji">
-          <img src="./images/emoji/angry.png" width="55" height="55" alt="emoji-angry">
+          <img src="./images/emoji/${comments[3].emotion}.png" width="55" height="55" alt="${comments[3].emotion}">
         </span>
         <div>
-          <p class="film-details__comment-text">Almost two hours? Seriously?</p>
+          <p class="film-details__comment-text">${comments[3].comment}</p>
           <p class="film-details__comment-info">
-            <span class="film-details__comment-author">John Doe</span>
-            <span class="film-details__comment-day">Today</span>
+            <span class="film-details__comment-author">${comments[3].author}</span>
+            <span class="film-details__comment-day">${dayjs(comments[3].date).fromNow()}</span>
             <button class="film-details__comment-delete">Delete</button>
           </p>
         </div>

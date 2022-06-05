@@ -31,10 +31,10 @@ const getRandomDate = () => {
   return dayjs(randomDay).format('MM/DD/YYYY');
 };
 
-const reverseDate = (date) => {
-  const [day, month, year] = date.split('/');
-  return `${month}/${day}/${year}`;
-};
+// const reverseDate = (date) => {
+//   const [day, month, year] = date.split('/');
+//   return `${month}/${day}/${year}`;
+// };
 
 const dateComarison = (firstDateStr, secondDateStr) => {
   const firstDate = dayjs(firstDateStr, 'MM/DD/YYYY');
