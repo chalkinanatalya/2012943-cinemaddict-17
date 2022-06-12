@@ -66,9 +66,4 @@ const makeActiveFilter = (filterType, value) => {
   }
 };
 
-const copy = (oldObj) => {
-  const newObj = JSON.parse(JSON.stringify(oldObj));
-  return newObj;
-};
-
-export {getRandomInteger, getRandomSubjects, humanizeTaskDueDate, getRandomDate, makeControlClass, copy, dateComarison, makeCheckedMark, makeActiveSort, makeActiveFilter};
+export {getRandomInteger, getRandomSubjects, humanizeTaskDueDate, getRandomDate, makeControlClass, dateComarison, makeCheckedMark, makeActiveSort, makeActiveFilter};

@@ -48,25 +48,27 @@ export default class FilmCardPresenter {
 
   #handleWatchlistClick = () => {
     if(this.#isPopupOpened) {
-      this.#updateMovie(UpdateType.MINOR, this.#movie.id, 'watchlist');
+      //console.log({ ...this.#movie, userDetails: { ...this.#movie.userDetails, watchlist: !this.#movie.userDetails['watchlist'] } });
+      this.#updateMovie(UpdateType.MINOR, { ...this.#movie, userDetails: { ...this.#movie.userDetails, watchlist: !this.#movie.userDetails['watchlist'] } } );
     } else {
-      this.#updateMovie(UpdateType.PATCH, this.#movie.id, 'watchlist');
+      //console.log({ ...this.#movie, userDetails: { ...this.#movie.userDetails, watchlist: !this.#movie.userDetails['watchlist'] } });
+      this.#updateMovie(UpdateType.PATCH, { ...this.#movie, userDetails: { ...this.#movie.userDetails, watchlist: !this.#movie.userDetails['watchlist'] } } );
     }
   };
 
   #handleWatchedClick = () => {
     if(this.#isPopupOpened) {
-      this.#updateMovie(UpdateType.MINOR, this.#movie.id, 'alreadyWatched');
+      this.#updateMovie(UpdateType.MINOR, { ...this.#movie, userDetails: { ...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails['alreadyWatched'] } } );
     } else {
-      this.#updateMovie(UpdateType.PATCH, this.#movie.id, 'alreadyWatched');
+      this.#updateMovie(UpdateType.PATCH, { ...this.#movie, userDetails: { ...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails['alreadyWatched'] } } );
     }
   };
 
   #handleFavoritelistClick = () => {
     if(this.#isPopupOpened) {
-      this.#updateMovie(UpdateType.MINOR, this.#movie.id, 'favorite');
+      this.#updateMovie(UpdateType.MINOR, { ...this.#movie, userDetails: { ...this.#movie.userDetails, favorite: !this.#movie.userDetails['favorite'] } } );
     } else {
-      this.#updateMovie(UpdateType.PATCH, this.#movie.id, 'favorite');
+      this.#updateMovie(UpdateType.PATCH, { ...this.#movie, userDetails: { ...this.#movie.userDetails, favorite: !this.#movie.userDetails['favorite'] } } );
     }
   };
 

@@ -30,24 +30,43 @@ export default class MovieModel extends Observable {
     return generateMovie(commentsList);
   });
 
-  updateMovie = (updateType, movieId, userDetail) => {
-    const movie = this.#movies.find((movies) => movies.id === movieId);
-    movie.userDetails[userDetail] = !movie.userDetails[userDetail];
-    this._notify(updateType, movieId);
+  updateMovie = (updateType, movieUpdate) => {
+    const movieIndex = this.#movies.findIndex((movie) => movie.id === movieUpdate.id);
+
+    this.#movies = [
+      ...this.#movies.slice(0, movieIndex),
+      movieUpdate,
+      ...this.#movies.slice(movieIndex + 1)
+    ];
+    this._notify(updateType, movieUpdate.id);
   };
 
-  addComment = (updateType, movieId, comment) => {
-    const movie = this.#movies.find((movies) => movies.id === movieId);
-    this.#comments.push(comment);
-    movie.comments.push(comment.id);
-    this._notify(updateType, movieId);
+  addComment = (updateType, movieUpdate, commentUpdate) => {
+    const movieIndex = this.#movies.findIndex((movie) => movie.id === movieUpdate.id);
+
+    this.#movies = [
+      ...this.#movies.slice(0, movieIndex),
+      movieUpdate,
+      ...this.#movies.slice(movieIndex + 1)
+    ];
+    this.#comments = [ ...this.#comments, commentUpdate];
+    this._notify(updateType, movieUpdate.id);
   };
 
-  deleteComment = (updateType, movieId, commentId) => {
-    const movie = this.#movies.find((movies) => movies.id === movieId);
-    this.#comments.splice(this.#comments.findIndex((comment) => comment === commentId), 1);
-    movie.comments.splice(movie.comments.findIndex((comment) => comment === commentId), 1);
-    this._notify(updateType, movieId);
+  deleteComment = (updateType, movieUpdate, commentDelete) => {
+    const movieIndex = this.#movies.findIndex((movie) => movie.id === movieUpdate.id);
+    const commentIndex = this.#comments.findIndex((comment) => comment.id === commentDelete.id);
+
+    this.#movies = [
+      ...this.#movies.slice(0, movieIndex),
+      movieUpdate,
+      ...this.#movies.slice(movieIndex + 1)
+    ];
+    this.#comments = [
+      ...this.#comments.slice(0, commentIndex),
+      ...this.#comments.slice(commentIndex + 1)
+    ];
+    this._notify(updateType, movieUpdate.id);
   };
 
   get movies () {

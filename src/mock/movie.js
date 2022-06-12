@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 
 export const generateMovie = (commentsList) => (
   {
-    id: `mov${nanoid()}`,
+    id: nanoid(),
     comments: commentsList,
     filmInfo: {
       title: MOCKTEXTLONG,

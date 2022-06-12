@@ -161,6 +161,7 @@ export default class ContentPresenter {
     remove(this.#filmContainer);
     remove(this.#filmContainerList);
     this.#filmCardPresenter.forEach((filmCard) => filmCard.destroy());
+    this.#filmCardPresenter = [];
   };
 
   #handleCardChange = (updateType, movieId) => {

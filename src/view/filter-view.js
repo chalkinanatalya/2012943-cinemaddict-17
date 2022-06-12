@@ -6,15 +6,15 @@ const createMenuTemplate = (currentFilter, filterList) => (
 
   `<nav class="main-navigation filter">
   <a href="#all" class="main-navigation__item ${makeActiveFilter(currentFilter, FilterType.ALL)}" data-filter="${FilterType.ALL}">All movies</a>
-  <a href="#watchlist" class="main-navigation__item ${makeActiveFilter(currentFilter, FilterType.WATCHLIST)}" data-filter="${FilterType.WATCHLIST}">Watchlist <span class="main-navigation__item-count">${filterList[0]}</span></a>
-  <a href="#history" class="main-navigation__item ${makeActiveFilter(currentFilter, FilterType.ALREADYWATCHED)}" data-filter="${FilterType.ALREADYWATCHED}">History <span class="main-navigation__item-count">${filterList[1]}</span></a>
-  <a href="#favorites" class="main-navigation__item ${makeActiveFilter(currentFilter, FilterType.FAVORITE)}" data-filter="${FilterType.FAVORITE}">Favorites <span class="main-navigation__item-count">${filterList[2]}</span></a>
+  <a href="#watchlist" class="main-navigation__item ${makeActiveFilter(currentFilter, FilterType.WATCHLIST)}" data-filter="${FilterType.WATCHLIST}">Watchlist <span class="main-navigation__item-count">${filterList.watchlist}</span></a>
+  <a href="#history" class="main-navigation__item ${makeActiveFilter(currentFilter, FilterType.ALREADYWATCHED)}" data-filter="${FilterType.ALREADYWATCHED}">History <span class="main-navigation__item-count">${filterList.alreadyWatched}</span></a>
+  <a href="#favorites" class="main-navigation__item ${makeActiveFilter(currentFilter, FilterType.FAVORITE)}" data-filter="${FilterType.FAVORITE}">Favorites <span class="main-navigation__item-count">${filterList.favorite}</span></a>
   </nav>`
 );
 
 export default class FilterView extends AbstractView {
   #currentFilter = null;
-  #filterList = [];
+  #filterList = {};
 
   constructor(currentFilterType, filterList) {
     super();

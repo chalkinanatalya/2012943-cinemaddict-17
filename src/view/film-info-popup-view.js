@@ -30,8 +30,7 @@ const commentTemplate = (comment) => (
 );
 
 const createCommentTemplate = (comments) => {
-  const commentsList = [];
-  comments.forEach((comment) => commentsList.push(commentTemplate(comment)));
+  const commentsList = comments.map((comment) => commentTemplate(comment));
 
   return commentsList;
 };
@@ -42,15 +41,7 @@ const createFilmInfoPopupTemplate = (movie, commentsList, newComment) => {
   const watchlist = userDetails.watchlist;
   const watchedFilm = userDetails.alreadyWatched;
   const favorite = userDetails.favorite;
-  const comments = [];
-
-  commentsList.some((commentList) =>
-    commentsId.some((commentId) => {
-      if (commentId === commentList.id) {
-        comments.push(commentList);
-      }
-    })
-  );
+  const comments = commentsList.filter((comment) => commentsId.includes(comment.id));
 
   return (`<section class="film-details ${movie.id}">
   <form class="film-details__inner" action="" method="get">
@@ -235,7 +226,8 @@ export default class FilmInfoPopup extends AbstractStateView {
     if (evt.ctrlKey && evt.key === 'Enter') {
       localStorage.setItem('scrollPositon', this.element.scrollTop);
       evt.preventDefault();
-      this._callback.addComment(UpdateType.MINOR, this.#movie.id, {id: `com${nanoid()}`, author: MOCKTEXTSHORT, comment: evt.target.value3, date: dayjs().format('MM/DD/YYYY'), emotion: this.#newComment.emotion});
+      const id = nanoid();
+      this._callback.addComment(UpdateType.MINOR, {...this.#movie, comments: [...this.#movie.comments, id]}, {id: id, author: MOCKTEXTSHORT, comment: evt.target.value, date: dayjs().format('MM/DD/YYYY'), emotion: this.#newComment.emotion});
     }
   };
 
@@ -247,7 +239,10 @@ export default class FilmInfoPopup extends AbstractStateView {
   #deleteCommentHandler = (evt) => {
     localStorage.setItem('scrollPositon', this.element.scrollTop);
     evt.preventDefault();
-    this._callback.deleteComment(UpdateType.MINOR, this.#movie.id, evt.target.getAttribute('data-commentId'));
+    const id = evt.target.getAttribute('data-commentId');
+    const commentIndex = this.#movie.comments.findIndex((comment) => comment === id);
+    const commentDelete = this.#comments.find((comment) => comment.id === id);
+    this._callback.deleteComment(UpdateType.MINOR, {...this.#movie, comments: [...this.#movie.comments.slice(0, commentIndex), ...this.#movie.comments.slice(commentIndex + 1)]}, {...commentDelete});
   };
 
   setDeleteCommentHandler = (callback) => {

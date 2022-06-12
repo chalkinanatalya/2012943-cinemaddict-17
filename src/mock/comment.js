@@ -3,7 +3,7 @@ import {getRandomDate, getRandomSubjects} from '../utils.js';
 import { nanoid } from 'nanoid';
 
 export const generateComment = () => (
-  { id: `com${nanoid()}`,
+  { id: nanoid(),
     author: MOCKTEXTSHORT,
     comment: MOCKTEXTLONG,
     date: getRandomDate(),

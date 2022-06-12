@@ -23,11 +23,11 @@ export default class FilterPresenter {
   }
 
   get filter() {
-    return [
-      this.#movieModel.calculateValues('watchlist'),
-      this.#movieModel.calculateValues('alreadyWatched'),
-      this.#movieModel.calculateValues('favorite')
-    ];
+    return {
+      watchlist: this.#movieModel.calculateValues('watchlist'),
+      alreadyWatched: this.#movieModel.calculateValues('alreadyWatched'),
+      favorite: this.#movieModel.calculateValues('favorite')
+    };
   }
 
   init = () => {
