@@ -81,14 +81,14 @@ export default class FilmCard extends AbstractView {
   };
 
   #watchlistClickHandler = () => {
-    this._callback.watchlistClick();
+    this._callback.watchlistClick('watchlist');
   };
 
   #watchedClickHandler = () => {
-    this._callback.watchedClick();
+    this._callback.watchedClick('alreadyWatched');
   };
 
   #favoriteClickHandler = () => {
-    this._callback.favoriteClick();
+    this._callback.favoriteClick('favorite');
   };
 }

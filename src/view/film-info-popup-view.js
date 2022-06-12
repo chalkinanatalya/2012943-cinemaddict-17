@@ -192,7 +192,7 @@ export default class FilmInfoPopup extends AbstractStateView {
   };
 
   #watchlistClickHandler = () => {
-    this._callback.watchlistClick();
+    this._callback.watchlistClick('watchlist');
   };
 
   setWatchedClickHandler = (callback) => {
@@ -201,7 +201,7 @@ export default class FilmInfoPopup extends AbstractStateView {
   };
 
   #watchedClickHandler = () => {
-    this._callback.watchedClick();
+    this._callback.watchedClick('alreadyWatched');
   };
 
   setFavoriteClickHandler = (callback) => {
@@ -210,7 +210,7 @@ export default class FilmInfoPopup extends AbstractStateView {
   };
 
   #favoriteClickHandler = () => {
-    this._callback.favoriteClick();
+    this._callback.favoriteClick('favorite');
   };
 
   setEmotionClickHandler = (callback) => {

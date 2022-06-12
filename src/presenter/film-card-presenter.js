@@ -46,29 +46,11 @@ export default class FilmCardPresenter {
     this.#isPopupOpened = state;
   };
 
-  #handleWatchlistClick = () => {
+  #handleDetailsClick = (details) => {
     if(this.#isPopupOpened) {
-      //console.log({ ...this.#movie, userDetails: { ...this.#movie.userDetails, watchlist: !this.#movie.userDetails['watchlist'] } });
-      this.#updateMovie(UpdateType.MINOR, { ...this.#movie, userDetails: { ...this.#movie.userDetails, watchlist: !this.#movie.userDetails['watchlist'] } } );
+      this.#updateMovie(UpdateType.MINOR, { ...this.#movie, userDetails: { ...this.#movie.userDetails, [details]: !this.#movie.userDetails[`${details}`] } } );
     } else {
-      //console.log({ ...this.#movie, userDetails: { ...this.#movie.userDetails, watchlist: !this.#movie.userDetails['watchlist'] } });
-      this.#updateMovie(UpdateType.PATCH, { ...this.#movie, userDetails: { ...this.#movie.userDetails, watchlist: !this.#movie.userDetails['watchlist'] } } );
-    }
-  };
-
-  #handleWatchedClick = () => {
-    if(this.#isPopupOpened) {
-      this.#updateMovie(UpdateType.MINOR, { ...this.#movie, userDetails: { ...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails['alreadyWatched'] } } );
-    } else {
-      this.#updateMovie(UpdateType.PATCH, { ...this.#movie, userDetails: { ...this.#movie.userDetails, alreadyWatched: !this.#movie.userDetails['alreadyWatched'] } } );
-    }
-  };
-
-  #handleFavoritelistClick = () => {
-    if(this.#isPopupOpened) {
-      this.#updateMovie(UpdateType.MINOR, { ...this.#movie, userDetails: { ...this.#movie.userDetails, favorite: !this.#movie.userDetails['favorite'] } } );
-    } else {
-      this.#updateMovie(UpdateType.PATCH, { ...this.#movie, userDetails: { ...this.#movie.userDetails, favorite: !this.#movie.userDetails['favorite'] } } );
+      this.#updateMovie(UpdateType.PATCH, { ...this.#movie, userDetails: { ...this.#movie.userDetails, [details]: !this.#movie.userDetails[`${details}`] } } );
     }
   };
 
@@ -96,9 +78,9 @@ export default class FilmCardPresenter {
   };
 
   #setFilmDetailsHandler = (film) => {
-    film.setWatchlistClickHandler(this.#handleWatchlistClick);
-    film.setWatchedClickHandler(this.#handleWatchedClick);
-    film.setFavoriteClickHandler(this.#handleFavoritelistClick);
+    film.setWatchlistClickHandler(this.#handleDetailsClick);
+    film.setWatchedClickHandler(this.#handleDetailsClick);
+    film.setFavoriteClickHandler(this.#handleDetailsClick);
   };
 
   openPopup = () => {
