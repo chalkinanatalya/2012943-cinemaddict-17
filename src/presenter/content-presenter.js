@@ -43,7 +43,7 @@ export default class ContentPresenter {
   }
 
   get movies() {
-    let movies = this.#movieModel.movies;
+    let movies = [...this.#movieModel.movies];
 
     if (this.#filterModel.filterType !== FilterType.ALL) {
       this.#renderOutputFilmCount = CARD_OUTPUT_AT_ONCE;

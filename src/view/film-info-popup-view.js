@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration.js';
 import relativeTime from 'dayjs/plugin/relativeTime.js';
 import { nanoid } from 'nanoid';
+import he from 'he';
 
 import AbstractStateView from '../framework/view/abstract-stateful-view.js';
 
@@ -135,7 +136,7 @@ const createFilmInfoPopupTemplate = (movie, commentsList, newComment) => {
           </div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${newComment.comment}</textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(newComment.comment)}</textarea>
           </label>
 
           <div class="film-details__emoji-list">
@@ -234,7 +235,7 @@ export default class FilmInfoPopup extends AbstractStateView {
     if (evt.ctrlKey && evt.key === 'Enter') {
       localStorage.setItem('scrollPositon', this.element.scrollTop);
       evt.preventDefault();
-      this._callback.addComment(UpdateType.MINOR, this.#movie.id, {id: `com${nanoid()}`, author: MOCKTEXTSHORT, comment: this.#newComment.comment, date: dayjs().format('MM/DD/YYYY'), emotion: this.#newComment.emotion});
+      this._callback.addComment(UpdateType.MINOR, this.#movie.id, {id: `com${nanoid()}`, author: MOCKTEXTSHORT, comment: evt.target.value3, date: dayjs().format('MM/DD/YYYY'), emotion: this.#newComment.emotion});
     }
   };
 
