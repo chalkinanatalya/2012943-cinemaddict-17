@@ -1,31 +1,33 @@
-import {render, remove, replace} from '../framework/render.js';
-import FilmCard from '../view/film-card-view.js';
 import FilmInfoPopup from '../view/film-info-popup-view.js';
-import {MOCKTEXTLONG, MOCKTEXTSHORT} from '../const.js';
-import {getRandomDate, getRandomInteger} from '../utils.js';
+import FilmCard from '../view/film-card-view.js';
+
+import {render, remove, replace} from '../framework/render.js';
+import {UpdateType, MOCKTEXTLONG} from '../const.js';
 
 const commentTemplate = {
-  id: getRandomInteger(1, 99),
-  author: MOCKTEXTSHORT,
   comment: MOCKTEXTLONG,
-  date: getRandomDate(),
   emotion: 'smile'
 };
 
 export default class FilmCardPresenter {
   #movie = null;
-  #changeData = null;
+  #updateMovie = null;
   #filmCard = null;
   #comments = null;
   #popupDelete = null;
   #filmInfoPopup = null;
   #isPopupOpened = null;
   #newComment = null;
+  #addComment = null;
+  #deleteComment = null;
 
-  constructor(movie, changeData, popupDelete) {
+  constructor(movie, updateMovie, addComment, deleteComment, popupDelete) {
     this.#movie = movie;
-    this.#changeData = changeData;
+
+    this.#updateMovie = updateMovie;
     this.#popupDelete = popupDelete;
+    this.#addComment = addComment;
+    this.#deleteComment = deleteComment;
   }
 
   get movie() {
@@ -40,24 +42,32 @@ export default class FilmCardPresenter {
     return this.#filmInfoPopup;
   }
 
-  get filmCard() {
-    return this.#filmCard;
-  }
-
   changeIsPopupOpened = (state) => {
     this.#isPopupOpened = state;
   };
 
   #handleWatchlistClick = () => {
-    this.#changeData(this.#movie, 'watchlist');
+    if(this.#isPopupOpened) {
+      this.#updateMovie(UpdateType.MINOR, this.#movie.id, 'watchlist');
+    } else {
+      this.#updateMovie(UpdateType.PATCH, this.#movie.id, 'watchlist');
+    }
   };
 
   #handleWatchedClick = () => {
-    this.#changeData(this.#movie, 'alreadyWatched');
+    if(this.#isPopupOpened) {
+      this.#updateMovie(UpdateType.MINOR, this.#movie.id, 'alreadyWatched');
+    } else {
+      this.#updateMovie(UpdateType.PATCH, this.#movie.id, 'alreadyWatched');
+    }
   };
 
   #handleFavoritelistClick = () => {
-    this.#changeData(this.#movie, 'favorite');
+    if(this.#isPopupOpened) {
+      this.#updateMovie(UpdateType.MINOR, this.#movie.id, 'favorite');
+    } else {
+      this.#updateMovie(UpdateType.PATCH, this.#movie.id, 'favorite');
+    }
   };
 
   #handleEmotionClick = (evt) => {
@@ -97,7 +107,12 @@ export default class FilmCardPresenter {
     this.#setListeners();
     this.#setFilmDetailsHandler(this.#filmInfoPopup);
     this.#filmInfoPopup._state = this.#newComment;
+
     this.#filmInfoPopup.setEmotionClickHandler(this.#handleEmotionClick);
+    this.#filmInfoPopup.setAddCommentHandler(this.#addComment);
+    this.#filmInfoPopup.setDeleteCommentHandler(this.#deleteComment);
+
+    this.#filmInfoPopup.element.scrollTop = localStorage.getItem('scrollPositon');
   };
 
   #renderPopup = () => {
@@ -114,6 +129,11 @@ export default class FilmCardPresenter {
     localStorage.setItem('scrollPositon', this.#filmInfoPopup.element.scrollTop);
     this.openPopup();
     this.#filmInfoPopup.element.scrollTop = localStorage.getItem('scrollPositon');
+  };
+
+  destroy = () => {
+    remove(this.#filmInfoPopup);
+    remove(this.#filmCard);
   };
 
   init = (renderPlace, comments, movie = 0) => {

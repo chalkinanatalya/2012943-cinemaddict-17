@@ -1,18 +1,55 @@
-import {makeControlClass, makeCheckedMark} from '../utils.js';
-import AbstractStateView from '../framework/view/abstract-stateful-view.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration.js';
 import RelativeTime from 'dayjs/plugin/RelativeTime.js';
+import { nanoid } from 'nanoid';
+
+import AbstractStateView from '../framework/view/abstract-stateful-view.js';
+
+import {makeControlClass, makeCheckedMark} from '../utils.js';
+import {UpdateType, MOCKTEXTSHORT} from '../const.js';
 
 const CONTAINER = 'popupContainer';
 dayjs.extend(duration);
 dayjs.extend(RelativeTime);
 
-const createFilmInfoPopupTemplate = (movie, comments, newComment) => {
+const commentTemplate = (comment) => (
+  `<li class="film-details__comment">
+    <span class="film-details__comment-emoji">
+      <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="${comment.emotion}">
+    </span>
+    <div>
+      <p class="film-details__comment-text">${comment.comment}</p>
+      <p class="film-details__comment-info">
+        <span class="film-details__comment-author">${comment.author}</span>
+        <span class="film-details__comment-day">${dayjs(comment.date).fromNow()}</span>
+        <button class="film-details__comment-delete" data-commentId="${comment.id}">Delete</button>
+      </p>
+    </div>
+  </li>`
+);
+
+const createCommentTemplate = (comments) => {
+  const commentsList = [];
+  comments.forEach((comment) => commentsList.push(commentTemplate(comment)));
+
+  return commentsList;
+};
+
+const createFilmInfoPopupTemplate = (movie, commentsList, newComment) => {
   const {filmInfo, userDetails} = movie;
+  const commentsId = movie.comments;
   const watchlist = userDetails.watchlist;
   const watchedFilm = userDetails.alreadyWatched;
   const favorite = userDetails.favorite;
+  const comments = [];
+
+  commentsList.some((commentList) =>
+    commentsId.some((commentId) => {
+      if (commentId === commentList.id) {
+        comments.push(commentList);
+      }
+    })
+  );
 
   return (`<section class="film-details ${movie.id}">
   <form class="film-details__inner" action="" method="get">
@@ -87,61 +124,9 @@ const createFilmInfoPopupTemplate = (movie, comments, newComment) => {
     </div>
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${movie.comments.length}</span></h3>
-
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsId.length}</span></h3>
         <ul class="film-details__comments-list">
-        <li class="film-details__comment">
-        <span class="film-details__comment-emoji">
-          <img src="./images/emoji/${comments[0].emotion}.png" width="55" height="55" alt="${comments[0].emotion}">
-        </span>
-        <div>
-          <p class="film-details__comment-text">${comments[0].comment}</p>
-          <p class="film-details__comment-info">
-            <span class="film-details__comment-author">${comments[0].author}</span>
-            <span class="film-details__comment-day">${dayjs(comments[0].date).fromNow()}</span>
-            <button class="film-details__comment-delete">Delete</button>
-          </p>
-        </div>
-      </li>
-      <li class="film-details__comment">
-        <span class="film-details__comment-emoji">
-          <img src="./images/emoji/${comments[1].emotion}.png" width="55" height="55" alt="${comments[1].emotion}">
-        </span>
-        <div>
-          <p class="film-details__comment-text">${comments[1].comment}</p>
-          <p class="film-details__comment-info">
-            <span class="film-details__comment-author">${comments[1].author}</span>
-            <span class="film-details__comment-day">${dayjs(comments[1].date).fromNow()}</span>
-            <button class="film-details__comment-delete">Delete</button>
-          </p>
-        </div>
-      </li>
-      <li class="film-details__comment">
-        <span class="film-details__comment-emoji">
-          <img src="./images/emoji/${comments[2].emotion}.png" width="55" height="55" alt="${comments[2].emotion}">
-        </span>
-        <div>
-          <p class="film-details__comment-text">${comments[2].comment}</p>
-          <p class="film-details__comment-info">
-            <span class="film-details__comment-author">${comments[2].author}</span>
-            <span class="film-details__comment-day">${dayjs(comments[2].date).fromNow()}</span>
-            <button class="film-details__comment-delete">Delete</button>
-          </p>
-        </div>
-      </li>
-      <li class="film-details__comment">
-        <span class="film-details__comment-emoji">
-          <img src="./images/emoji/${comments[3].emotion}.png" width="55" height="55" alt="${comments[3].emotion}">
-        </span>
-        <div>
-          <p class="film-details__comment-text">${comments[3].comment}</p>
-          <p class="film-details__comment-info">
-            <span class="film-details__comment-author">${comments[3].author}</span>
-            <span class="film-details__comment-day">${dayjs(comments[3].date).fromNow()}</span>
-            <button class="film-details__comment-delete">Delete</button>
-          </p>
-        </div>
-      </li>
+          ${createCommentTemplate(comments)}
         </ul>
 
         <div class="film-details__new-comment">
@@ -192,8 +177,9 @@ export default class FilmInfoPopup extends AbstractStateView {
     this.#movie = movie;
     this.#comments = comments;
     this.#newComment = newComment;
-
   }
+
+  get newComment() { return this.#newComment;}
 
   get template() {
     return createFilmInfoPopupTemplate(this.#movie, this.#comments, this.#newComment);
@@ -204,9 +190,17 @@ export default class FilmInfoPopup extends AbstractStateView {
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#hideClickHandler);
   };
 
+  #hideClickHandler = () => {
+    this._callback.hideClick();
+  };
+
   setWatchlistClickHandler = (callback) => {
     this._callback.watchlistClick = callback;
     this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchlistClickHandler);
+  };
+
+  #watchlistClickHandler = () => {
+    this._callback.watchlistClick();
   };
 
   setWatchedClickHandler = (callback) => {
@@ -214,9 +208,17 @@ export default class FilmInfoPopup extends AbstractStateView {
     this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#watchedClickHandler);
   };
 
+  #watchedClickHandler = () => {
+    this._callback.watchedClick();
+  };
+
   setFavoriteClickHandler = (callback) => {
     this._callback.favoriteClick = callback;
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
+  };
+
+  #favoriteClickHandler = () => {
+    this._callback.favoriteClick();
   };
 
   setEmotionClickHandler = (callback) => {
@@ -224,23 +226,31 @@ export default class FilmInfoPopup extends AbstractStateView {
     this.element.querySelectorAll('.film-details__emoji-list input').forEach((emotionLabel) => emotionLabel.addEventListener('click', this.#emotionClickHandler));
   };
 
-  #watchlistClickHandler = () => {
-    this._callback.watchlistClick();
-  };
-
-  #watchedClickHandler = () => {
-    this._callback.watchedClick();
-  };
-
-  #favoriteClickHandler = () => {
-    this._callback.favoriteClick();
-  };
-
-  #hideClickHandler = () => {
-    this._callback.hideClick();
-  };
-
   #emotionClickHandler = (evt) => {
     this._callback.emotionClick(evt);
+  };
+
+  #addCommentHandler = (evt) => {
+    if (evt.ctrlKey && evt.key === 'Enter') {
+      localStorage.setItem('scrollPositon', this.element.scrollTop);
+      evt.preventDefault();
+      this._callback.addComment(UpdateType.MINOR, this.#movie.id, {id: `com${nanoid()}`, author: MOCKTEXTSHORT, comment: this.#newComment.comment, date: dayjs().format('MM/DD/YYYY'), emotion: this.#newComment.emotion});
+    }
+  };
+
+  setAddCommentHandler = (callback) => {
+    this._callback.addComment = callback;
+    this.element.querySelector('textarea').addEventListener('keydown', this.#addCommentHandler);
+  };
+
+  #deleteCommentHandler = (evt) => {
+    localStorage.setItem('scrollPositon', this.element.scrollTop);
+    evt.preventDefault();
+    this._callback.deleteComment(UpdateType.MINOR, this.#movie.id, evt.target.getAttribute('data-commentId'));
+  };
+
+  setDeleteCommentHandler = (callback) => {
+    this._callback.deleteComment = callback;
+    this.element.querySelectorAll('.film-details__comment-delete').forEach((deleteButton) => deleteButton.addEventListener('click', this.#deleteCommentHandler));
   };
 }

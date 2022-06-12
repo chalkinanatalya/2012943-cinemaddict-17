@@ -3,4 +3,29 @@ const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];
 const MOCKTEXTLONG = 'lorem ipsum dolor sit amet, consectet';
 const MOCKTEXTSHORT = 'sed augue';
 
-export {POSTERS, EMOTIONS, MOCKTEXTLONG, MOCKTEXTSHORT};
+const UserAction = {
+  UPDATE_TASK: 'UPDATE_COMMENT',
+  ADD_TASK: 'ADD_COMMENT',
+  DELETE_TASK: 'DELETE_COMMENT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const FilterType = {
+  ALL: 'all',
+  WATCHLIST: 'watchlist',
+  ALREADYWATCHED: 'alreadyWatched',
+  FAVORITE: 'favorite',
+};
+
+const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RAITING: 'raiting',
+};
+
+export {POSTERS, EMOTIONS, MOCKTEXTLONG, MOCKTEXTSHORT, UserAction, UpdateType, FilterType, SortType};

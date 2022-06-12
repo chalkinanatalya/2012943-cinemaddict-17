@@ -1,13 +1,13 @@
 import {EMOTIONS, MOCKTEXTLONG, MOCKTEXTSHORT} from '../const.js';
-import {getRandomDate, getRandomSubjects, getRandomInteger} from '../utils.js';
+import {getRandomDate, getRandomSubjects} from '../utils.js';
+import { nanoid } from 'nanoid';
 
 export const generateComment = () => (
-  { id: getRandomInteger(1, 99),
+  { id: `com${nanoid()}`,
     author: MOCKTEXTSHORT,
     comment: MOCKTEXTLONG,
     date: getRandomDate(),
     emotion: getRandomSubjects(EMOTIONS)
-
   }
 );
 

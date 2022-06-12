@@ -7,7 +7,7 @@ const CONTAINER = 'cardContainer';
 dayjs.extend(duration);
 
 const createCardTemplate = (movie) => {
-  const {filmInfo, userDetails} = movie;
+  const {comments, filmInfo, userDetails} = movie;
 
   const watchlist = userDetails.watchlist;
   const watchedFilm = userDetails.alreadyWatched;
@@ -24,7 +24,7 @@ const createCardTemplate = (movie) => {
     </p>
     <img src="./images/posters/${filmInfo.poster}" alt="" class="film-card__poster">
     <p class="film-card__description">${filmInfo.description}</p>
-    <span class="film-card__comments">89 comments</span>
+    <span class="film-card__comments">${comments.length} comments</span>
   </a>
   <div class="film-card__controls">
     <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${makeControlClass(watchlist, CONTAINER)}" type="button">Add to watchlist</button>
@@ -76,6 +76,7 @@ export default class FilmCard extends AbstractView {
   };
 
   #showClickHandler = () => {
+    localStorage.setItem('scrollPositon', 0);
     this._callback.showClick();
   };
 

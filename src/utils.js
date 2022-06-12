@@ -31,11 +31,6 @@ const getRandomDate = () => {
   return dayjs(randomDay).format('MM/DD/YYYY');
 };
 
-// const reverseDate = (date) => {
-//   const [day, month, year] = date.split('/');
-//   return `${month}/${day}/${year}`;
-// };
-
 const dateComarison = (firstDateStr, secondDateStr) => {
   const firstDate = dayjs(firstDateStr, 'MM/DD/YYYY');
   const secondDate = dayjs(secondDateStr, 'MM/DD/YYYY');
@@ -59,33 +54,21 @@ const makeCheckedMark = (emotionType, value) => {
   }
 };
 
+const makeActiveSort = (sortType, value) => {
+  if(sortType === value) {
+    return 'sort__button--active';
+  }
+};
+
+const makeActiveFilter = (filterType, value) => {
+  if(filterType === value) {
+    return 'main-navigation__item--active';
+  }
+};
+
 const copy = (oldObj) => {
   const newObj = JSON.parse(JSON.stringify(oldObj));
   return newObj;
 };
 
-const reverse = (movie, userDetail) => {
-  const changedMovie = copy(movie);
-  changedMovie.userDetails[userDetail] = !changedMovie.userDetails[userDetail];
-  return changedMovie;
-};
-
-const findCards = (array, {searchType, data}) => {
-  const newCardList = [];
-  for(let i = 0; i < array.length; i++) {
-    if(searchType === 'id') {
-      const newCard = array[i].find((filmCard) => filmCard.movie.id === data);
-      if(newCard) {
-        newCardList.push(newCard);
-      }
-    } else {
-      const newCard = array[i].find((filmCard) => filmCard.isPopupOpened === data);
-      if(newCard) {
-        newCardList.push(newCard);
-      }
-    }
-  }
-  return newCardList;
-};
-
-export {getRandomInteger, getRandomSubjects, humanizeTaskDueDate, getRandomDate, makeControlClass, reverse, copy, findCards, dateComarison, makeCheckedMark};
+export {getRandomInteger, getRandomSubjects, humanizeTaskDueDate, getRandomDate, makeControlClass, copy, dateComarison, makeCheckedMark, makeActiveSort, makeActiveFilter};
