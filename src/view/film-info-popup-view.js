@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration.js';
-import RelativeTime from 'dayjs/plugin/RelativeTime.js';
+import relativeTime from 'dayjs/plugin/relativeTime.js';
 import { nanoid } from 'nanoid';
 
 import AbstractStateView from '../framework/view/abstract-stateful-view.js';
@@ -10,7 +10,7 @@ import {UpdateType, MOCKTEXTSHORT} from '../const.js';
 
 const CONTAINER = 'popupContainer';
 dayjs.extend(duration);
-dayjs.extend(RelativeTime);
+dayjs.extend(relativeTime);
 
 const commentTemplate = (comment) => (
   `<li class="film-details__comment">
