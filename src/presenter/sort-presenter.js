@@ -19,6 +19,7 @@ export default class SortPresenter {
     this.#sortModel = sortModel;
 
     this.#sortModel.addObserver(this.#handleModelEvent);
+    //this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   init = () => {

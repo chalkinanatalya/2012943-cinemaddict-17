@@ -2,6 +2,10 @@ const POSTERS =['made-for-each-other.png', 'popeye-meets-sinbad.png', 'sagebrush
 const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];
 const MOCKTEXTLONG = 'lorem ipsum dolor sit amet, consectet';
 const MOCKTEXTSHORT = 'sed augue';
+const GENRE = ['Drama', 'Film-Noir', 'Mystery'];
+const ACTORS = ['Erich von Stroheim', 'Mary Beth Hughes', 'Dan Duryea'];
+const WRITERS = ['Anne Wigton', 'Heinz Herald', 'Richard Weil'];
+const DESCRIPTION = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
 
 const UserAction = {
   UPDATE_TASK: 'UPDATE_COMMENT',
@@ -13,6 +17,7 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 const FilterType = {
@@ -25,7 +30,14 @@ const FilterType = {
 const SortType = {
   DEFAULT: 'default',
   DATE: 'date',
-  RAITING: 'raiting',
+  RATING: 'rating',
 };
 
-export {POSTERS, EMOTIONS, MOCKTEXTLONG, MOCKTEXTSHORT, UserAction, UpdateType, FilterType, SortType};
+const NoFilm = {
+  ALL: 'There are no movies in our database',
+  WATCHLIST: 'There are no movies to watch now',
+  ALREADYWATCHED: 'There are no watched movies now',
+  FAVORITE: 'There are no favorite movies now',
+};
+
+export {POSTERS, EMOTIONS, GENRE, ACTORS, WRITERS, MOCKTEXTLONG, MOCKTEXTSHORT, DESCRIPTION, UserAction, UpdateType, FilterType, SortType, NoFilm};

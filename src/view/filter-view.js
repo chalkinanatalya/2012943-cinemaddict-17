@@ -3,7 +3,6 @@ import {FilterType} from '../const.js';
 import {makeActiveFilter} from '../utils.js';
 
 const createMenuTemplate = (currentFilter, filterList) => (
-
   `<nav class="main-navigation filter">
   <a href="#all" class="main-navigation__item ${makeActiveFilter(currentFilter, FilterType.ALL)}" data-filter="${FilterType.ALL}">All movies</a>
   <a href="#watchlist" class="main-navigation__item ${makeActiveFilter(currentFilter, FilterType.WATCHLIST)}" data-filter="${FilterType.WATCHLIST}">Watchlist <span class="main-navigation__item-count">${filterList.watchlist}</span></a>
@@ -32,6 +31,6 @@ export default class FilterView extends AbstractView {
   };
 
   #filterByOption = (evt) => {
-    this._callback.filterOptionClick(evt.target.getAttribute('data-filter'));
+    this._callback.filterOptionClick(evt.currentTarget.getAttribute('data-filter'));
   };
 }

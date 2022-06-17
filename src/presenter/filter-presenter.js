@@ -1,6 +1,6 @@
 import {render, replace, remove} from '../framework/render.js';
 import FilterView from '../view/filter-view.js';
-import {UpdateType} from '../const.js';
+import {UpdateType, SortType} from '../const.js';
 
 export default class FilterPresenter {
   #mainContainer = null;
@@ -49,8 +49,8 @@ export default class FilterPresenter {
     if (this.#filterModel.filterType === filterType) {
       return;
     }
-
     this.#filterModel.setFilter(UpdateType.PATCH, filterType);
+    this.#sortModel.setSort(UpdateType.PATCH, SortType.DEFAULT);
   };
 
   #handleModelEvent = () => {

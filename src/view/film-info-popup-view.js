@@ -1,47 +1,27 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration.js';
 import relativeTime from 'dayjs/plugin/relativeTime.js';
-import { nanoid } from 'nanoid';
 import he from 'he';
 
 import AbstractStateView from '../framework/view/abstract-stateful-view.js';
 
 import {makeControlClass, makeCheckedMark} from '../utils.js';
-import {UpdateType, MOCKTEXTSHORT} from '../const.js';
+import {UpdateType} from '../const.js';
 
 const CONTAINER = 'popupContainer';
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 
-const commentTemplate = (comment) => (
-  `<li class="film-details__comment">
-    <span class="film-details__comment-emoji">
-      <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="${comment.emotion}">
-    </span>
-    <div>
-      <p class="film-details__comment-text">${comment.comment}</p>
-      <p class="film-details__comment-info">
-        <span class="film-details__comment-author">${comment.author}</span>
-        <span class="film-details__comment-day">${dayjs(comment.date).fromNow()}</span>
-        <button class="film-details__comment-delete" data-commentId="${comment.id}">Delete</button>
-      </p>
-    </div>
-  </li>`
-);
+const createGenreTemplate = (genres) => {
+  let genreTemplate = '';
+  genres.forEach((genre) => {genreTemplate += `<span class="film-details__genre">${genre}</span>`;});
 
-const createCommentTemplate = (comments) => {
-  const commentsList = comments.map((comment) => commentTemplate(comment));
-
-  return commentsList;
+  return genreTemplate;
 };
 
-const createFilmInfoPopupTemplate = (movie, commentsList, newComment) => {
+const createFilmInfoPopupTemplate = (movie, newComment) => {
   const {filmInfo, userDetails} = movie;
-  const commentsId = movie.comments;
-  const watchlist = userDetails.watchlist;
-  const watchedFilm = userDetails.alreadyWatched;
-  const favorite = userDetails.favorite;
-  const comments = commentsList.filter((comment) => commentsId.includes(comment.id));
+  const genre = filmInfo.genre.length === 1 ? 'Genre' : 'Genres';
 
   return (`<section class="film-details ${movie.id}">
   <form class="film-details__inner" action="" method="get">
@@ -51,9 +31,9 @@ const createFilmInfoPopupTemplate = (movie, commentsList, newComment) => {
       </div>
       <div class="film-details__info-wrap">
         <div class="film-details__poster">
-          <img class="film-details__poster-img" src="./images/posters/${filmInfo.poster}" alt="">
+          <img class="film-details__poster-img" src="./${filmInfo.poster}" alt="">
 
-          <p class="film-details__age">${filmInfo.ageRaiting}</p>
+          <p class="film-details__age">${filmInfo.ageRating}</p>
         </div>
 
         <div class="film-details__info">
@@ -64,7 +44,7 @@ const createFilmInfoPopupTemplate = (movie, commentsList, newComment) => {
             </div>
 
             <div class="film-details__rating">
-              <p class="film-details__total-rating">${filmInfo.ageRaiting}</p>
+              <p class="film-details__total-rating">${filmInfo.ageRating}</p>
             </div>
           </div>
 
@@ -75,11 +55,11 @@ const createFilmInfoPopupTemplate = (movie, commentsList, newComment) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Writers</td>
-              <td class="film-details__cell">${filmInfo.writers}</td>
+              <td class="film-details__cell">${filmInfo.writers.join(', ')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Actors</td>
-              <td class="film-details__cell">${filmInfo.actors}</td>
+              <td class="film-details__cell">${filmInfo.actors.join(', ')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
@@ -94,11 +74,9 @@ const createFilmInfoPopupTemplate = (movie, commentsList, newComment) => {
               <td class="film-details__cell">${filmInfo.release.releaseCountry}</td>
             </tr>
             <tr class="film-details__row">
-              <td class="film-details__term">Genres</td>
+              <td class="film-details__term">${genre}</td>
               <td class="film-details__cell">
-                <span class="film-details__genre">${filmInfo.genre}</span>
-                <span class="film-details__genre">Film-Noir</span>
-                <span class="film-details__genre">Mystery</span></td>
+                ${createGenreTemplate(filmInfo.genre)}
             </tr>
           </table>
 
@@ -109,17 +87,14 @@ const createFilmInfoPopupTemplate = (movie, commentsList, newComment) => {
       </div>
 
       <section class="film-details__controls">
-        <button type="button" class="film-details__control-button film-details__control-button--watchlist ${makeControlClass(watchlist, CONTAINER)}" id="watchlist" name="watchlist">Add to watchlist</button>
-        <button type="button" class="film-details__control-button film-details__control-button--watched ${makeControlClass(watchedFilm, CONTAINER)}" id="watched" name="watched">Already watched</button>
-        <button type="button" class="film-details__control-button film-details__control-button--favorite ${makeControlClass(favorite, CONTAINER)}" id="favorite" name="favorite">Add to favorites</button>
+        <button type="button" class="film-details__control-button film-details__control-button--watchlist ${makeControlClass(userDetails.watchlist, CONTAINER)}" data-detail="watchlist">Add to watchlist</button>
+        <button type="button" class="film-details__control-button film-details__control-button--watched ${makeControlClass(userDetails.alreadyWatched, CONTAINER)}" data-detail="alreadyWatched">Already watched</button>
+        <button type="button" class="film-details__control-button film-details__control-button--favorite ${makeControlClass(userDetails.favorite, CONTAINER)}" data-detail="favorite">Add to favorites</button>
       </section>
     </div>
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsId.length}</span></h3>
-        <ul class="film-details__comments-list">
-          ${createCommentTemplate(comments)}
-        </ul>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">are loading...</span></h3>
 
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
@@ -161,20 +136,18 @@ const createFilmInfoPopupTemplate = (movie, commentsList, newComment) => {
 
 export default class FilmInfoPopup extends AbstractStateView {
   #movie = null;
-  #comments = null;
   #newComment = null;
 
-  constructor(movie, comments, newComment) {
+  constructor(movie, newComment) {
     super();
     this.#movie = movie;
-    this.#comments = comments;
     this.#newComment = newComment;
   }
 
   get newComment() { return this.#newComment;}
 
   get template() {
-    return createFilmInfoPopupTemplate(this.#movie, this.#comments, this.#newComment);
+    return createFilmInfoPopupTemplate(this.#movie, this.#newComment);
   }
 
   hidePopupClickHandler = (callback) => {
@@ -186,31 +159,14 @@ export default class FilmInfoPopup extends AbstractStateView {
     this._callback.hideClick();
   };
 
-  setWatchlistClickHandler = (callback) => {
-    this._callback.watchlistClick = callback;
-    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchlistClickHandler);
+  setDetailsClickHandler = (callback) => {
+    this._callback.detailsClick = callback;
+    this.element.querySelectorAll('.film-details__controls button').forEach((filmDetails) => filmDetails.addEventListener('click', this.#detailsClickHandler));
   };
 
-  #watchlistClickHandler = () => {
-    this._callback.watchlistClick('watchlist');
-  };
-
-  setWatchedClickHandler = (callback) => {
-    this._callback.watchedClick = callback;
-    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#watchedClickHandler);
-  };
-
-  #watchedClickHandler = () => {
-    this._callback.watchedClick('alreadyWatched');
-  };
-
-  setFavoriteClickHandler = (callback) => {
-    this._callback.favoriteClick = callback;
-    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
-  };
-
-  #favoriteClickHandler = () => {
-    this._callback.favoriteClick('favorite');
+  #detailsClickHandler = (evt) => {
+    localStorage.setItem('scrollPositon', this.element.scrollTop);
+    this._callback.detailsClick(evt.target.getAttribute('data-detail'));
   };
 
   setEmotionClickHandler = (callback) => {
@@ -223,30 +179,15 @@ export default class FilmInfoPopup extends AbstractStateView {
   };
 
   #addCommentHandler = (evt) => {
-    if (evt.ctrlKey && evt.key === 'Enter') {
+    if ((evt.metaKey && evt.key === 'Enter') || (evt.ctrlKey && evt.key === 'Enter')) {
       localStorage.setItem('scrollPositon', this.element.scrollTop);
       evt.preventDefault();
-      const id = nanoid();
-      this._callback.addComment(UpdateType.MINOR, {...this.#movie, comments: [...this.#movie.comments, id]}, {id: id, author: MOCKTEXTSHORT, comment: evt.target.value, date: dayjs().format('MM/DD/YYYY'), emotion: this.#newComment.emotion});
+      this._callback.addComment(UpdateType.MINOR, {...this.#movie}, {comment: evt.target.value, emotion: this.#newComment.emotion});
     }
   };
 
   setAddCommentHandler = (callback) => {
     this._callback.addComment = callback;
     this.element.querySelector('textarea').addEventListener('keydown', this.#addCommentHandler);
-  };
-
-  #deleteCommentHandler = (evt) => {
-    localStorage.setItem('scrollPositon', this.element.scrollTop);
-    evt.preventDefault();
-    const id = evt.target.getAttribute('data-commentId');
-    const commentIndex = this.#movie.comments.findIndex((comment) => comment === id);
-    const commentDelete = this.#comments.find((comment) => comment.id === id);
-    this._callback.deleteComment(UpdateType.MINOR, {...this.#movie, comments: [...this.#movie.comments.slice(0, commentIndex), ...this.#movie.comments.slice(commentIndex + 1)]}, {...commentDelete});
-  };
-
-  setDeleteCommentHandler = (callback) => {
-    this._callback.deleteComment = callback;
-    this.element.querySelectorAll('.film-details__comment-delete').forEach((deleteButton) => deleteButton.addEventListener('click', this.#deleteCommentHandler));
   };
 }

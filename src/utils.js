@@ -19,16 +19,11 @@ const getRandomSubjects = (subjects) => subjects[getRandomInteger(0, subjects.le
 const humanizeTaskDueDate = (dueDate) => dayjs(dueDate).format('D MMMM');
 
 const getRandomDate = () => {
-  const year = getRandomInteger(2000, 2022);
-  const month = getRandomInteger(1, 12);
-  let day = getRandomInteger(1, 31);
+  const start = new Date(2000, 0, 1);
+  const end =  new Date();
 
-  if(month === 2) {
-    day = getRandomInteger(1, 28);
-  }
-
-  const randomDay = new Date(year, month, day);
-  return dayjs(randomDay).format('MM/DD/YYYY');
+  const randomDay = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+  return dayjs(randomDay);
 };
 
 const dateComarison = (firstDateStr, secondDateStr) => {

@@ -1,7 +1,8 @@
 import FilmInfoPopup from '../view/film-info-popup-view.js';
 import FilmCard from '../view/film-card-view.js';
+import CommentsList from '../view/comments-list-view.js';
 
-import {render, remove, replace} from '../framework/render.js';
+import {render, remove} from '../framework/render.js';
 import {UpdateType, MOCKTEXTLONG} from '../const.js';
 
 const commentTemplate = {
@@ -11,23 +12,21 @@ const commentTemplate = {
 
 export default class FilmCardPresenter {
   #movie = null;
-  #updateMovie = null;
+  #movieModel = null;
   #filmCard = null;
-  #comments = null;
-  #popupDelete = null;
   #filmInfoPopup = null;
+  #commentsList = null;
   #isPopupOpened = null;
-  #newComment = null;
-  #addComment = null;
-  #deleteComment = null;
+  #container = null;
 
-  constructor(movie, updateMovie, addComment, deleteComment, popupDelete) {
+  #popupDelete = null;
+
+  constructor(movie, movieModel, popupDelete, container) {
     this.#movie = movie;
+    this.#container = container;
+    this.#movieModel = movieModel;
 
-    this.#updateMovie = updateMovie;
     this.#popupDelete = popupDelete;
-    this.#addComment = addComment;
-    this.#deleteComment = deleteComment;
   }
 
   get movie() {
@@ -42,73 +41,88 @@ export default class FilmCardPresenter {
     return this.#filmInfoPopup;
   }
 
+  get container() {
+    return this.#container;
+  }
+
   changeIsPopupOpened = (state) => {
     this.#isPopupOpened = state;
   };
 
   #handleDetailsClick = (details) => {
+    let updateType = null;
+
     if(this.#isPopupOpened) {
-      this.#updateMovie(UpdateType.MINOR, { ...this.#movie, userDetails: { ...this.#movie.userDetails, [details]: !this.#movie.userDetails[`${details}`] } } );
+      if(details === 'alreadyWatched') {
+        updateType = UpdateType.MAJOR;
+      } else {
+        updateType = UpdateType.MINOR;
+      }
     } else {
-      this.#updateMovie(UpdateType.PATCH, { ...this.#movie, userDetails: { ...this.#movie.userDetails, [details]: !this.#movie.userDetails[`${details}`] } } );
+      if(details === 'alreadyWatched') {
+        updateType = UpdateType.PATCH;
+      }
     }
+
+    this.#movieModel.updateMovie(updateType, { ...this.#movie, userDetails: { ...this.#movie.userDetails, [details]: !this.#movie.userDetails[`${details}`] } } );
   };
 
   #handleEmotionClick = (evt) => {
     this.#emotionClick(evt.target.value);
   };
 
-  #setListeners = () => {
-    const closePopup = () => {
-      document.querySelector('body').classList.remove('hide-overflow');
-      remove(this.#filmInfoPopup);
-      this.#isPopupOpened = false;
-    };
-
-    const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        closePopup();
-      }
-    };
-
-    document.removeEventListener('keydown', onEscKeyDown);
-    this.#filmInfoPopup.hidePopupClickHandler(closePopup);
-    document.addEventListener('keydown', onEscKeyDown);
+  #closePopup = () => {
+    document.querySelector('body').classList.remove('hide-overflow');
+    remove(this.#filmInfoPopup);
+    this.#isPopupOpened = false;
   };
 
-  #setFilmDetailsHandler = (film) => {
-    film.setWatchlistClickHandler(this.#handleDetailsClick);
-    film.setWatchedClickHandler(this.#handleDetailsClick);
-    film.setFavoriteClickHandler(this.#handleDetailsClick);
+  #onEscKeyDown = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this.#closePopup();
+    }
+  };
+
+  #setListeners = () => {
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+    this.#filmInfoPopup.hidePopupClickHandler(this.#closePopup);
+    document.addEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  #loadComments = async () => {
+    this.#commentsList = new CommentsList(this.#movie, this.#movieModel.getComments);
+    await this.#commentsList.loadComments();
+    render(this.#commentsList, document.querySelector('.film-details__comments-title'), 'afterend');
+    this.#commentsList.setDeleteCommentHandler(this.#movieModel.deleteComment);
   };
 
   openPopup = () => {
     document.querySelector('body').classList.add('hide-overflow');
     this.#popupDelete();
     this.#isPopupOpened = true;
+
+    this.#filmInfoPopup = new FilmInfoPopup(this.#movie, this.#movieModel.newComment);
     render(this.#filmInfoPopup, document.querySelector('.footer'));
     this.#setListeners();
-    this.#setFilmDetailsHandler(this.#filmInfoPopup);
-    this.#filmInfoPopup._state = this.#newComment;
+    this.#filmInfoPopup.setDetailsClickHandler(this.#handleDetailsClick);
+    this.#filmInfoPopup._state = this.#movieModel.newComment;
 
     this.#filmInfoPopup.setEmotionClickHandler(this.#handleEmotionClick);
-    this.#filmInfoPopup.setAddCommentHandler(this.#addComment);
-    this.#filmInfoPopup.setDeleteCommentHandler(this.#deleteComment);
-
+    this.#filmInfoPopup.setAddCommentHandler(this.#movieModel.addComment);
+    this.#loadComments();
     this.#filmInfoPopup.element.scrollTop = localStorage.getItem('scrollPositon');
   };
 
   #renderPopup = () => {
-    if(!this.#newComment) {
-      this.#newComment = JSON.parse(JSON.stringify(commentTemplate));
+    if(!this.#movieModel.newComment) {
+      this.#movieModel.newComment = JSON.parse(JSON.stringify(commentTemplate));
     }
-    this.#filmInfoPopup = new FilmInfoPopup(this.#movie, this.#comments, this.#newComment);
     this.#filmCard.showPopupClickHandler(this.openPopup);
   };
 
   #emotionClick = (emotionType) => {
-    this.#newComment.emotion = emotionType;
+    this.#movieModel.newComment.emotion = emotionType;
     this.#filmInfoPopup._setState({emotion: emotionType});
     localStorage.setItem('scrollPositon', this.#filmInfoPopup.element.scrollTop);
     this.openPopup();
@@ -116,27 +130,19 @@ export default class FilmCardPresenter {
   };
 
   destroy = () => {
-    remove(this.#filmInfoPopup);
+    this.#closePopup();
     remove(this.#filmCard);
   };
 
-  init = (renderPlace, comments, movie = 0) => {
-    if(movie) {
-      this.#movie = movie;
-      const oldFilmCard = this.#filmCard;
-      const newFilmCard = new FilmCard(this.#movie);
-      replace(newFilmCard, oldFilmCard);
-      this.#filmCard = newFilmCard;
-      this.#popupDelete();
-    } else {
-      this.#comments = comments;
-      this.#filmCard = new FilmCard(this.#movie);
+  init = (renderPlace) => {
+    this.#filmCard = new FilmCard(this.#movie);
+    if (renderPlace !== 'popup') {
       render(this.#filmCard, renderPlace);
     }
 
     this.#renderPopup();
 
-    this.#setFilmDetailsHandler(this.#filmCard);
+    this.#filmCard.setDetailsClickHandler(this.#handleDetailsClick);
   };
 
 }

@@ -6,7 +6,7 @@ const createSortTemplate = (currentSort) => (
   ` <ul class="sort">
   <li><a href="#" class="sort__button ${makeActiveSort(currentSort, SortType.DEFAULT)}" data-sort="${SortType.DEFAULT}">Sort by default</a></li>
   <li><a href="#" class="sort__button ${makeActiveSort(currentSort, SortType.DATE)}" data-sort="${SortType.DATE}">Sort by date</a></li>
-  <li><a href="#" class="sort__button ${makeActiveSort(currentSort, SortType.RAITING)}" data-sort="${SortType.RAITING}">Sort by rating</a></li>
+  <li><a href="#" class="sort__button ${makeActiveSort(currentSort, SortType.RATING)}" data-sort="${SortType.RATING}">Sort by rating</a></li>
 </ul>`
 );
 
