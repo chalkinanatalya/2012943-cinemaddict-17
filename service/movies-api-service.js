@@ -6,23 +6,19 @@ const Method = {
 };
 
 export default class MoviesApiService extends ApiService {
-  get movies() {
-    return this._load({url: 'movies'})
-      .then(ApiService.parseResponse);
+  async fetchMovies() {
+    const response = await this._load({ url: 'movies' });
+    return ApiService.parseResponse(response);
   }
 
-  updateMovie = async (movie) => {
-    const response = await this._load({
+  updateMovie = async (movie) => (
+    await this._load({
       url: `movies/${movie.id}`,
       method: Method.PUT,
       body: JSON.stringify(this.#adaptToServer(movie)),
       headers: new Headers({'Content-Type': 'application/json'}),
-    });
-
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return parsedResponse;
-  };
+    }).then(ApiService.parseResponse)
+  );
 
   #adaptToServer = (movie) => {
     const adaptedMovie = {

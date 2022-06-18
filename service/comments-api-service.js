@@ -14,22 +14,18 @@ export default class CommentsApiService extends ApiService {
     return response;
   };
 
-  addComment = async (comment, movie) => {
-    const response = await this._load({
+  addComment = async (comment, movie) => (
+    await this._load({
       url: `comments/${movie.id}`,
       method: Method.POST,
       body: JSON.stringify(comment),
       headers: new Headers({'Content-Type': 'application/json'}),
-    });
+    }).then(ApiService.parseResponse)
+  );
 
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return parsedResponse;
-  };
-
-  deleteComment = async (comment) => {
+  deleteComment = async (commentId) => {
     const response = await this._load({
-      url: `tasks/${comment.id}`,
+      url: `comments/${commentId}`,
       method: Method.DELETE,
     });
 

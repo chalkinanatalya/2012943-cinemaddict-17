@@ -23,10 +23,9 @@ const commentTemplate = (comment) => (
   </li>`
 );
 
-
 const createCommentTemplate = (comments) => (
   `<ul class="film-details__comments-list">
-    ${comments.map((comment) => commentTemplate(comment))}
+    ${comments.map((comment) => commentTemplate(comment)).join('')}
   </ul>`
 );
 
@@ -50,17 +49,15 @@ export default class CommentsList extends AbstractStateView {
     try{
       this.#comments = await this.#getComments(this.#movie.id);
     } catch(err) {
-      this.#comments = [{author: 'SERVER', comment: 'Sorry, something went wrong.', date: dayjs(), emotion: 'sleeping'}];
+      this.#comments = [];
     }
   };
 
   #deleteCommentHandler = async (evt) => {
-    localStorage.setItem('scrollPositon', this.element.scrollTop);
     evt.preventDefault();
     const id = evt.target.getAttribute('data-commentId');
     const commentIndex = this.#movie.comments.findIndex((comment) => comment === id);
-    const commentDelete = this.#comments.find((comment) => comment.id === id);
-    this._callback.deleteComment(UpdateType.MINOR, {...this.#movie, comments: [...this.#movie.comments.slice(0, commentIndex), ...this.#movie.comments.slice(commentIndex + 1)]}, {...commentDelete});
+    this._callback.deleteComment(UpdateType.MINOR, {...this.#movie, comments: [...this.#movie.comments.slice(0, commentIndex), ...this.#movie.comments.slice(commentIndex + 1)]}, id);
   };
 
   setDeleteCommentHandler = (callback) => {

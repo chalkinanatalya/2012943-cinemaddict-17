@@ -23,7 +23,7 @@ const createCardTemplate = (movie) => {
       <span class="film-card__duration">${dayjs.duration(filmInfo.runTime, 'minutes').format('HH[h] mm[m]')}</span>
       <span class="film-card__genre">${filmInfo.genre[0]}</span>
     </p>
-    <img src="./${filmInfo.poster}" alt="" class="film-card__poster">
+    <img src="${filmInfo.poster}" alt="" class="film-card__poster">
     <p class="film-card__description">${description}</p>
     <span class="film-card__comments">${comments.length} comments</span>
   </a>
@@ -63,7 +63,7 @@ export default class FilmCard extends AbstractView {
 
   setDetailsClickHandler = (callback) => {
     this._callback.detailsClick = callback;
-    this.element.querySelectorAll('.film-card__controls button').forEach((filmDetails) => filmDetails.addEventListener('click', this.#detailsClickHandler));
+    this.element.querySelector('.film-card__controls').addEventListener('click', this.#detailsClickHandler);
   };
 
   #detailsClickHandler = (evt) => {

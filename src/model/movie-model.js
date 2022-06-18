@@ -16,6 +16,16 @@ export default class MovieModel extends Observable {
     return this.#movies;
   }
 
+  init = async () => {
+    try {
+      const movies = await this.#moviesApiService.fetchMovies();
+      this.#movies = movies.map(this.#adaptMovieToClient);
+    } catch(err) {
+      this.#movies = [];
+    }
+    this._notify(UpdateType.INIT);
+  };
+
   getComments = async (movieId) =>{
     let comments = [];
     try {
@@ -25,16 +35,6 @@ export default class MovieModel extends Observable {
     }
 
     return comments;
-  };
-
-  init = async () => {
-    try {
-      const movies = await this.#moviesApiService.movies;
-      this.#movies = movies.map(this.#adaptMovieToClient);
-    } catch(err) {
-      this.#movies = [];
-    }
-    this._notify(UpdateType.INIT);
   };
 
   updateMovie = async (updateType, movieUpdate) => {
@@ -79,11 +79,11 @@ export default class MovieModel extends Observable {
     }
   };
 
-  deleteComment = async (updateType, movieUpdate, commentDelete) => {
+  deleteComment = async (updateType, movieUpdate, commentId) => {
     const movieIndex = this.#movies.findIndex((movie) => movie.id === movieUpdate.id);
 
     try {
-      await this.#commentsApiService.deleteComment(commentDelete);
+      await this.#commentsApiService.deleteComment(commentId);
       this.#movies = [
         ...this.#movies.slice(0, movieIndex),
         movieUpdate,

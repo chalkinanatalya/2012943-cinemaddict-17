@@ -1,12 +1,13 @@
 import FilmInfoPopup from '../view/film-info-popup-view.js';
 import FilmCard from '../view/film-card-view.js';
 import CommentsList from '../view/comments-list-view.js';
+import NewCommentView from '../view/new-comment-view.js';
 
 import {render, remove} from '../framework/render.js';
-import {UpdateType, MOCKTEXTLONG} from '../const.js';
+import {UpdateType} from '../const.js';
 
 const commentTemplate = {
-  comment: MOCKTEXTLONG,
+  comment: '',
   emotion: 'smile'
 };
 
@@ -16,6 +17,7 @@ export default class FilmCardPresenter {
   #filmCard = null;
   #filmInfoPopup = null;
   #commentsList = null;
+  #newComment = null;
   #isPopupOpened = null;
   #container = null;
 
@@ -67,10 +69,6 @@ export default class FilmCardPresenter {
     this.#movieModel.updateMovie(updateType, { ...this.#movie, userDetails: { ...this.#movie.userDetails, [details]: !this.#movie.userDetails[`${details}`] } } );
   };
 
-  #handleEmotionClick = (evt) => {
-    this.#emotionClick(evt.target.value);
-  };
-
   #closePopup = () => {
     document.querySelector('body').classList.remove('hide-overflow');
     remove(this.#filmInfoPopup);
@@ -94,7 +92,16 @@ export default class FilmCardPresenter {
     this.#commentsList = new CommentsList(this.#movie, this.#movieModel.getComments);
     await this.#commentsList.loadComments();
     render(this.#commentsList, document.querySelector('.film-details__comments-title'), 'afterend');
-    this.#commentsList.setDeleteCommentHandler(this.#movieModel.deleteComment);
+    this.#commentsList.setDeleteCommentHandler(this.#handleDeleteComment);
+    this.#filmInfoPopup.element.scrollTop = localStorage.getItem('scrollPositon');
+  };
+
+  #loadNewComment = () => {
+    this.#newComment = new NewCommentView(this.#movie, JSON.parse(JSON.stringify(commentTemplate)));
+    render(this.#newComment, document.querySelector('.film-details__comments-wrap'), 'beforeend');
+    this.#newComment.setEmotionClickHandler(this.#handleEmotionClick);
+    this.#newComment.setAddCommentHandler(this.#handleAddComment);
+    this.#filmInfoPopup.element.scrollTop = localStorage.getItem('scrollPositon');
   };
 
   openPopup = () => {
@@ -102,30 +109,33 @@ export default class FilmCardPresenter {
     this.#popupDelete();
     this.#isPopupOpened = true;
 
-    this.#filmInfoPopup = new FilmInfoPopup(this.#movie, this.#movieModel.newComment);
+    this.#filmInfoPopup = new FilmInfoPopup(this.#movie);
     render(this.#filmInfoPopup, document.querySelector('.footer'));
     this.#setListeners();
     this.#filmInfoPopup.setDetailsClickHandler(this.#handleDetailsClick);
-    this.#filmInfoPopup._state = this.#movieModel.newComment;
 
-    this.#filmInfoPopup.setEmotionClickHandler(this.#handleEmotionClick);
-    this.#filmInfoPopup.setAddCommentHandler(this.#movieModel.addComment);
+    this.#loadNewComment();
     this.#loadComments();
     this.#filmInfoPopup.element.scrollTop = localStorage.getItem('scrollPositon');
   };
 
   #renderPopup = () => {
-    if(!this.#movieModel.newComment) {
-      this.#movieModel.newComment = JSON.parse(JSON.stringify(commentTemplate));
-    }
     this.#filmCard.showPopupClickHandler(this.openPopup);
   };
 
-  #emotionClick = (emotionType) => {
-    this.#movieModel.newComment.emotion = emotionType;
-    this.#filmInfoPopup._setState({emotion: emotionType});
+  #handleAddComment = (updateType, movie, comment) => {
     localStorage.setItem('scrollPositon', this.#filmInfoPopup.element.scrollTop);
-    this.openPopup();
+    this.#movieModel.addComment(updateType, movie, comment);
+  };
+
+  #handleDeleteComment = (updateType, movie, comment) => {
+    localStorage.setItem('scrollPositon', this.#filmInfoPopup.element.scrollTop);
+    this.#movieModel.deleteComment(updateType, movie, comment);
+  };
+
+  #handleEmotionClick = (emotionType, comment) => {
+    localStorage.setItem('scrollPositon', this.#filmInfoPopup.element.scrollTop);
+    this.#newComment.updateElement({comment: comment, emotion: emotionType});
     this.#filmInfoPopup.element.scrollTop = localStorage.getItem('scrollPositon');
   };
 

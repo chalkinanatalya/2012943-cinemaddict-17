@@ -1,11 +1,9 @@
-const POSTERS =['made-for-each-other.png', 'popeye-meets-sinbad.png', 'sagebrush-trail.jpg', 'santa-claus-conquers-the-martians.jpg', 'the-dance-of-life.jpg', 'the-great-flamarion.jpg', 'the-man-with-the-golden-arm.jpg'];
-const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];
-const MOCKTEXTLONG = 'lorem ipsum dolor sit amet, consectet';
-const MOCKTEXTSHORT = 'sed augue';
-const GENRE = ['Drama', 'Film-Noir', 'Mystery'];
-const ACTORS = ['Erich von Stroheim', 'Mary Beth Hughes', 'Dan Duryea'];
-const WRITERS = ['Anne Wigton', 'Heinz Herald', 'Richard Weil'];
-const DESCRIPTION = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+const EMOTIONS = {
+  SMILE: 'smile',
+  SLEEPING: 'sleeping',
+  PUKE: 'puke',
+  ANGRY: 'angry',
+};
 
 const UserAction = {
   UPDATE_TASK: 'UPDATE_COMMENT',
@@ -40,4 +38,4 @@ const NoFilm = {
   FAVORITE: 'There are no favorite movies now',
 };
 
-export {POSTERS, EMOTIONS, GENRE, ACTORS, WRITERS, MOCKTEXTLONG, MOCKTEXTSHORT, DESCRIPTION, UserAction, UpdateType, FilterType, SortType, NoFilm};
+export {EMOTIONS, UserAction, UpdateType, FilterType, SortType, NoFilm};
