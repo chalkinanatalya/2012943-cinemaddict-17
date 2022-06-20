@@ -5,8 +5,12 @@ import relativeTime from 'dayjs/plugin/relativeTime.js';
 import AbstractStateView from '../framework/view/abstract-stateful-view.js';
 
 import {makeControlClass} from '../utils.js';
+import './film-info-popup-view.css';
 
 const CONTAINER = 'popupContainer';
+const SHAKE_CLASS_NAME = 'shake-popup';
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 
@@ -31,7 +35,7 @@ const createFilmInfoPopupTemplate = (movie) => {
         <div class="film-details__poster">
           <img class="film-details__poster-img" src="${filmInfo.poster}" alt="">
 
-          <p class="film-details__age">${filmInfo.ageRating}</p>
+          <p class="film-details__age">${filmInfo.ageRating}+</p>
         </div>
 
         <div class="film-details__info">
@@ -42,7 +46,7 @@ const createFilmInfoPopupTemplate = (movie) => {
             </div>
 
             <div class="film-details__rating">
-              <p class="film-details__total-rating">${filmInfo.ageRating}</p>
+              <p class="film-details__total-rating">${filmInfo.totalRating}</p>
             </div>
           </div>
 
@@ -93,6 +97,7 @@ const createFilmInfoPopupTemplate = (movie) => {
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">are loading...</span></h3>
+        <ul class="film-details__comments-list"></ul>
       </section>
     </div>
   </form>
@@ -112,6 +117,10 @@ export default class FilmInfoPopup extends AbstractStateView {
     return createFilmInfoPopupTemplate(this.#movie);
   }
 
+  setCommentsCount = (commentsCount) => {
+    this.element.querySelector('.film-details__comments-count').innerHTML = `${commentsCount}`;
+  };
+
   hidePopupClickHandler = (callback) => {
     this._callback.hideClick = callback;
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#hideClickHandler);
@@ -130,4 +139,12 @@ export default class FilmInfoPopup extends AbstractStateView {
     localStorage.setItem('scrollPositon', this.element.scrollTop);
     this._callback.detailsClick(evt.target.getAttribute('data-detail'));
   };
+
+  shake(callback) {
+    this.element.classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      this.element.classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
 }

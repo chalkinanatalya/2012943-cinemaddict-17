@@ -1,6 +1,6 @@
 import FilmInfoPopup from '../view/film-info-popup-view.js';
 import FilmCard from '../view/film-card-view.js';
-import CommentsList from '../view/comments-list-view.js';
+import Comment from '../view/comment-view.js';
 import NewCommentView from '../view/new-comment-view.js';
 
 import {render, remove} from '../framework/render.js';
@@ -13,22 +13,28 @@ const commentTemplate = {
 
 export default class FilmCardPresenter {
   #movie = null;
+  #comments = [];
   #movieModel = null;
-  #filmCard = null;
-  #filmInfoPopup = null;
-  #commentsList = null;
-  #newComment = null;
   #isPopupOpened = null;
   #container = null;
 
-  #popupDelete = null;
+  #filmCard = null;
+  #filmInfoPopup = null;
+  #commentsList = [];
+  #newComment = null;
 
-  constructor(movie, movieModel, popupDelete, container) {
+  #popupDelete = null;
+  #block = null;
+  #unblock = null;
+
+  constructor(movie, movieModel, popupDelete, container, block, unblock) {
     this.#movie = movie;
     this.#container = container;
     this.#movieModel = movieModel;
 
     this.#popupDelete = popupDelete;
+    this.#block = block;
+    this.#unblock = unblock;
   }
 
   get movie() {
@@ -51,9 +57,10 @@ export default class FilmCardPresenter {
     this.#isPopupOpened = state;
   };
 
-  #handleDetailsClick = (details) => {
-    let updateType = null;
+  #handleDetailsClick = async (details) => {
+    this.#block();
 
+    let updateType = null;
     if(this.#isPopupOpened) {
       if(details === 'alreadyWatched') {
         updateType = UpdateType.MAJOR;
@@ -66,7 +73,17 @@ export default class FilmCardPresenter {
       }
     }
 
-    this.#movieModel.updateMovie(updateType, { ...this.#movie, userDetails: { ...this.#movie.userDetails, [details]: !this.#movie.userDetails[`${details}`] } } );
+    try {
+      await this.#movieModel.updateMovie(updateType, { ...this.#movie, userDetails: { ...this.#movie.userDetails, [details]: !this.#movie.userDetails[`${details}`] } } );
+    } catch (err) {
+      if(updateType === UpdateType.PATCH || !updateType) {
+        this.#filmCard.shake();
+      } else {
+        this.#filmInfoPopup.shake();
+      }
+    }
+
+    this.#unblock();
   };
 
   #closePopup = () => {
@@ -89,10 +106,19 @@ export default class FilmCardPresenter {
   };
 
   #loadComments = async () => {
-    this.#commentsList = new CommentsList(this.#movie, this.#movieModel.getComments);
-    await this.#commentsList.loadComments();
-    render(this.#commentsList, document.querySelector('.film-details__comments-title'), 'afterend');
-    this.#commentsList.setDeleteCommentHandler(this.#handleDeleteComment);
+    try{
+      this.#comments = await this.#movieModel.getComments(this.#movie.id);
+    } catch(err) {
+      this.#comments = [];
+    }
+    this.#comments.forEach((comment) => {
+      const commentsList = new Comment(this.#movie, comment);
+      this.#commentsList.push(commentsList);
+      render(commentsList, document.querySelector('.film-details__comments-list'), 'beforeend');
+      commentsList.setDeleteCommentHandler(this.#handleDeleteComment);
+    });
+    this.#filmInfoPopup.setCommentsCount(this.#comments.length);
+
     this.#filmInfoPopup.element.scrollTop = localStorage.getItem('scrollPositon');
   };
 
@@ -123,14 +149,31 @@ export default class FilmCardPresenter {
     this.#filmCard.showPopupClickHandler(this.openPopup);
   };
 
-  #handleAddComment = (updateType, movie, comment) => {
-    localStorage.setItem('scrollPositon', this.#filmInfoPopup.element.scrollTop);
-    this.#movieModel.addComment(updateType, movie, comment);
+  #handleAddComment = async (evt, updateType, movie, comment) => {
+    evt.target.readOnly = true;
+    try {
+      localStorage.setItem('scrollPositon', this.#filmInfoPopup.element.scrollTop);
+      await this.#movieModel.addComment(updateType, movie, comment);
+    } catch (err) {
+      this.#newComment.shake();
+    }
+
+    evt.target.readOnly = false;
   };
 
-  #handleDeleteComment = (updateType, movie, comment) => {
-    localStorage.setItem('scrollPositon', this.#filmInfoPopup.element.scrollTop);
-    this.#movieModel.deleteComment(updateType, movie, comment);
+  #handleDeleteComment = async (evt, updateType, movie, comment) => {
+    evt.target.disabled = true;
+    evt.target.textContent = 'Deleting...';
+
+    try {
+      localStorage.setItem('scrollPositon', this.#filmInfoPopup.element.scrollTop);
+      await this.#movieModel.deleteComment(updateType, movie, comment);
+    } catch (err) {
+      this.#commentsList.find((commentView) => commentView.comment.id === evt.target.getAttribute('data-commentId')).shake();
+    }
+
+    evt.target.textContent = 'Delete';
+    evt.target.disabled = false;
   };
 
   #handleEmotionClick = (emotionType, comment) => {

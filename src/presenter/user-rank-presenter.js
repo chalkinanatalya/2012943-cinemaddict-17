@@ -44,7 +44,7 @@ export default class UserRankPresenter {
   };
 
   #handleModelEvent = (updateType) => {
-    if(updateType === UpdateType.PATCH || updateType === UpdateType.MAJOR) {
+    if(updateType === UpdateType.PATCH || updateType === UpdateType.MAJOR || updateType === UpdateType.INIT) {
       this.init();
     }
   };

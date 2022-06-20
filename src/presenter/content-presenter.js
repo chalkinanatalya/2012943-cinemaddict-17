@@ -9,8 +9,9 @@ import NoFilmView from '../view/no-film-view.js';
 import LoadingView from '../view/loading-view.js';
 
 import {dateComarison} from '../utils.js';
-import {UpdateType, FilterType, SortType} from '../const.js';
+import {UpdateType, FilterType, SortType, TimeLimit} from '../const.js';
 import {render, remove} from '../framework/render.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 
 const CARD_OUTPUT_AT_ONCE = 5;
@@ -25,6 +26,7 @@ export default class ContentPresenter {
   #filmContainerList = new FilmContainerList();
   #showMoreButton = new ShowMoreButton();
   #loadingComponent = new LoadingView();
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
   #noFilm = null;
 
   #filmCards = [];
@@ -94,7 +96,7 @@ export default class ContentPresenter {
   #renderCards = (movies, place, container, creationType = 0) => {
     const renderPlace = place.element.querySelector('.films-list__container');
     for(let i = 0; i < movies.length; i++) {
-      const filmCard = new FilmCardPresenter(movies[i], this.#movieModel, this.#popupDelete, container);
+      const filmCard = new FilmCardPresenter(movies[i], this.#movieModel, this.#popupDelete, container, this.#uiBlocker.block, this.#uiBlocker.unblock);
       this.#filmCards.push(filmCard);
       if(creationType === 'popup') {
         filmCard.init('popup');

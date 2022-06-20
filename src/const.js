@@ -38,4 +38,9 @@ const NoFilm = {
   FAVORITE: 'There are no favorite movies now',
 };
 
-export {EMOTIONS, UserAction, UpdateType, FilterType, SortType, NoFilm};
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
+
+export {EMOTIONS, UserAction, UpdateType, FilterType, SortType, NoFilm, TimeLimit};
