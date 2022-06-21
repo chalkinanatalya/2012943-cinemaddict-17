@@ -164,6 +164,11 @@ export default class ContentPresenter {
 
   #renderTop = (topType) => {
     const movies = this.#movies(topType);
+
+    if(!movies.length) {
+      return;
+    }
+
     let topComponent = null;
 
     if (topType === 'rating') {
@@ -198,10 +203,10 @@ export default class ContentPresenter {
     } else {
       this.#removeFilmContainer();
       this.init();
-      if(!this.#filmCards.filter((filmCard) => filmCard.container === 'main').length) {
-        let lastMovie = [...this.#movieModel.movies];
-        lastMovie = lastMovie.filter((movie) => movie.id === movieId);
-        this.#renderCards(lastMovie, this.#filmContainerList, 'main', 'popup');
+      if(this.#filmCards.findIndex((filmCard) => (filmCard.movie.id === movieId && filmCard.container === 'main')) === -1) {
+        let invicibleFilmCard = [...this.#movieModel.movies];
+        invicibleFilmCard = invicibleFilmCard.filter((movie) => movie.id === movieId);
+        this.#renderCards(invicibleFilmCard, this.#filmContainerList, 'main', 'popup');
       }
       if(updateType === UpdateType.MINOR || updateType === UpdateType.MAJOR) {
         const popup = this.#filmCards.find((filmCard) => (filmCard.movie.id === movieId && filmCard.container === 'main'));
