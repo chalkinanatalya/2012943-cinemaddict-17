@@ -62,21 +62,15 @@ export default class FilmCardPresenter {
 
     let updateType = null;
     if(this.#isPopupOpened) {
-      if(details === 'alreadyWatched') {
-        updateType = UpdateType.MAJOR;
-      } else {
-        updateType = UpdateType.MINOR;
-      }
+      updateType = UpdateType.MAJOR;
     } else {
-      if(details === 'alreadyWatched') {
-        updateType = UpdateType.PATCH;
-      }
+      updateType = UpdateType.MINOR;
     }
 
     try {
       await this.#movieModel.updateMovie(updateType, { ...this.#movie, userDetails: { ...this.#movie.userDetails, [details]: !this.#movie.userDetails[`${details}`] } } );
     } catch (err) {
-      if(updateType === UpdateType.PATCH || !updateType) {
+      if(updateType === UpdateType.MINOR) {
         this.#filmCard.shake();
       } else {
         this.#filmInfoPopup.shake();

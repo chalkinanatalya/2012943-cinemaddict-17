@@ -34,6 +34,7 @@ export default class ContentPresenter {
   #sortType = SortType.DEFAULT;
   #filterType = FilterType.ALL;
   #isLoading = true;
+  #isReloaded = false;
 
   constructor(mainContainer, movieModel, filterModel, sortModel) {
     this.#mainContainer = mainContainer;
@@ -50,18 +51,21 @@ export default class ContentPresenter {
     let movies = [...this.#movieModel.movies];
     if (container === 'main') {
       if (this.#filterModel.filterType !== FilterType.ALL) {
-        this.#renderOutputFilmCount = CARD_OUTPUT_AT_ONCE;
         this.#filterType = this.#filterModel.filterType;
         movies = movies.filter((movie) => movie.userDetails[this.#filterType]);
       }
 
       if (this.#sortModel.sortType !== SortType.DEFAULT) {
-        this.#renderOutputFilmCount = CARD_OUTPUT_AT_ONCE;
         this.#sortType = this.#sortModel.sortType;
         movies = this.#sortCards(movies);
       }
     } else {
       movies = this.#topFilter(movies, container);
+    }
+
+    if (this.#isReloaded) {
+      this.#renderOutputFilmCount = CARD_OUTPUT_AT_ONCE;
+      this.#isReloaded = false;
     }
     return movies;
   }
@@ -156,7 +160,7 @@ export default class ContentPresenter {
     render(this.#filmContainerList, this.#filmContainer.element, 'afterbegin');
 
     this.#renderCards(movies.slice(0, this.#renderOutputFilmCount), this.#filmContainerList, 'main');
-    if(movies.length > CARD_OUTPUT_AT_ONCE) {
+    if(movies.length > this.#renderOutputFilmCount) {
       render(this.#showMoreButton, this.#filmContainerList.element);
       this.#renderShowMoreButton();
     }
@@ -198,17 +202,23 @@ export default class ContentPresenter {
   #handleCardChange = (updateType, movieId) => {
     if(updateType === UpdateType.INIT) {
       this.#isLoading = false;
+      this.#isReloaded = true;
       remove(this.#loadingComponent);
       this.init();
     } else {
       this.#removeFilmContainer();
+      if (updateType === UpdateType.PATCH) {
+        this.#isReloaded = true;
+      } else {
+        this.#isReloaded = false;
+      }
       this.init();
       if(this.#filmCards.findIndex((filmCard) => (filmCard.movie.id === movieId && filmCard.container === 'main')) === -1) {
         let invicibleFilmCard = [...this.#movieModel.movies];
         invicibleFilmCard = invicibleFilmCard.filter((movie) => movie.id === movieId);
         this.#renderCards(invicibleFilmCard, this.#filmContainerList, 'main', 'popup');
       }
-      if(updateType === UpdateType.MINOR || updateType === UpdateType.MAJOR) {
+      if(updateType === UpdateType.MAJOR) {
         const popup = this.#filmCards.find((filmCard) => (filmCard.movie.id === movieId && filmCard.container === 'main'));
         if(popup) {
           popup.openPopup();

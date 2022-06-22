@@ -75,7 +75,7 @@ export default class NewCommentView extends AbstractStateView {
   #addCommentHandler = (evt) => {
     if ((evt.metaKey && evt.key === 'Enter') || (evt.ctrlKey && evt.key === 'Enter')) {
       evt.preventDefault();
-      this._callback.addComment(evt, UpdateType.MINOR, {...this.#movie}, {comment: he.encode(evt.target.value), emotion: this.#parseStateToComment().emotion});
+      this._callback.addComment(evt, UpdateType.MAJOR, {...this.#movie}, {comment: he.encode(evt.target.value), emotion: this.#parseStateToComment().emotion});
     }
   };
 

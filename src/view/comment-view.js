@@ -45,7 +45,7 @@ export default class Comment extends AbstractStateView {
     evt.preventDefault();
     const id = evt.target.getAttribute('data-commentId');
     const commentIndex = this.#movie.comments.findIndex((comment) => comment === id);
-    this._callback.deleteComment(evt, UpdateType.MINOR, {...this.#movie, comments: [...this.#movie.comments.slice(0, commentIndex), ...this.#movie.comments.slice(commentIndex + 1)]}, id);
+    this._callback.deleteComment(evt, UpdateType.MAJOR, {...this.#movie, comments: [...this.#movie.comments.slice(0, commentIndex), ...this.#movie.comments.slice(commentIndex + 1)]}, id);
   };
 
   setDeleteCommentHandler = (callback) => {

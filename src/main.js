@@ -24,7 +24,7 @@ const sortModel = new SortModel();
 
 const userRankPresenter = new UserRankPresenter(siteHeaderPart, movieModel);
 const filterPresenter = new FilterPresenter(siteMainPart, movieModel, filterModel, sortModel);
-const sortPresenter = new SortPresenter(siteMainPart, movieModel, filterModel, sortModel);
+const sortPresenter = new SortPresenter(siteMainPart, movieModel, sortModel);
 const contentPresenter = new ContentPresenter(siteMainPart, movieModel, filterModel, sortModel);
 const footerPresenter = new FooterPresenter(siteFooterPart, movieModel);
 

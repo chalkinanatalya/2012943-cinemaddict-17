@@ -40,11 +40,14 @@ export default class UserRankPresenter {
 
       replace(this.#userRankComponent, prevUserRankComponent);
       remove(prevUserRankComponent);
+    } else {
+      remove(this.#userRankComponent);
+      this.#userRankComponent = null;
     }
   };
 
   #handleModelEvent = (updateType) => {
-    if(updateType === UpdateType.PATCH || updateType === UpdateType.MAJOR || updateType === UpdateType.INIT) {
+    if(UpdateType.MINOR || updateType === UpdateType.MAJOR || updateType === UpdateType.INIT) {
       this.init();
     }
   };

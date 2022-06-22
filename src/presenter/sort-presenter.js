@@ -5,36 +5,36 @@ import {UpdateType} from '../const.js';
 export default class SortPresenter {
   #mainContainer = null;
 
-  #movieModel = null;
-  #filterModel = null;
   #sortModel = null;
+  #movieModel = null;
 
   #sortComponent = null;
 
-  constructor(mainContainer, movieModel, filterModel, sortModel) {
+  constructor(mainContainer, movieModel, sortModel) {
     this.#mainContainer = mainContainer;
 
-    this.#movieModel = movieModel;
-    this.#filterModel = filterModel;
     this.#sortModel = sortModel;
+    this.#movieModel = movieModel;
 
     this.#sortModel.addObserver(this.#handleModelEvent);
-    //this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#movieModel.addObserver(this.#handleModelEvent);
   }
 
   init = () => {
-    const prevSortComponent = this.#sortComponent;
+    if (this.#movieModel.movies.length) {
+      const prevSortComponent = this.#sortComponent;
 
-    this.#sortComponent = new SortView(this.#sortModel.sortType);
-    this.#sortComponent.setSortByOption(this.#handleSortByOption);
+      this.#sortComponent = new SortView(this.#sortModel.sortType);
+      this.#sortComponent.setSortByOption(this.#handleSortByOption);
 
-    if (prevSortComponent === null) {
-      render(this.#sortComponent, this.#mainContainer, 'beforebegin');
-      return;
+      if (prevSortComponent === null) {
+        render(this.#sortComponent, this.#mainContainer, 'beforebegin');
+        return;
+      }
+
+      replace(this.#sortComponent, prevSortComponent);
+      remove(prevSortComponent);
     }
-
-    replace(this.#sortComponent, prevSortComponent);
-    remove(prevSortComponent);
   };
 
   #handleSortByOption = (sortType) => {
